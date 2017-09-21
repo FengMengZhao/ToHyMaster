@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <h2>This page is to test async and sync of javascript.</h2>
+        <script>
+            function foo() {
+            // don't ever do crazy long-running loops like this
+                for (var i=0; i<=100000; i++) {
+                console.log(i);
+                }
+            }
+            foo();
+            console.log('I come after the request');
+        </script>
+    </body>
+
+</html>
