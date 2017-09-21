@@ -1,9 +1,9 @@
-###JavaScript
+### JavaScript
 
 `document.getElementById('ID').innerHTML=''`统一使用单引号.
 `document.getElementById("ID").innerHTML=""`或者统一使用双引号.
 
-####JS环境
+#### JS环境
 
 在一段程序代码中发起一个调用并等待直到调用返回结果再执行接下来的代码,这个调用对于这段程序来说是同步的;而发起一个调用后不用等待调用结果而直接执行后面的代码,这个调用对于这段程序来说就是异步的.
 
@@ -15,7 +15,7 @@ JavaScript语言的一大特性是单线程,主要是因为JavaScript主要用�
 
 JavaScript程序的异步是由其运行环境提供的,通过event loop实现异步编程.
 
-####JS是如何工作的
+#### JS是如何工作的
 
 1. JavaScript在编译时会生成堆和栈,堆存放的是程序运行过程中产生的对象,栈时JavaScript的执行栈,程序代码会根据调用关系被压入栈中执行;
 2. 当遇到WegAPIs(IO或者定时器)时,浏览器会响应调用并直接返回,stack继续执行剩余JavaScript代码;
