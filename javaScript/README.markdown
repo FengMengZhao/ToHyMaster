@@ -22,4 +22,4 @@ JavaScript程序的异步是由其运行环境提供的,通过event loop实现�
 3. 当WegAPIs调用完成后,会将相应的结果与回调函数依次放入callback queue中;
 4. 当执行栈中没有要执行的JavaScript代码时,则会通过event loop检查并取出callback queue中第一个回调函数,并执行.
 
-JavaScript代码会在执行引擎的执行栈中以单线程的方式执行,而所有的IO或定时人户会通过运行环境异步执行,并将执行结果放在callback queue中等待被调用,这就是所谓的单线程异步工作原理.
+JavaScript代码会在执行引擎的执行栈中以单线程的方式执行,而所有的IO或定时任务会通过运行环境异步执行,并将执行结果放在callback queue中等待被调用,这就是所谓的单线程异步工作原理.
