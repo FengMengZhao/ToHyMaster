@@ -34,7 +34,7 @@ JSP的生命周期是一个将JSP Page转化为Servlet的过程,目的是为了�
     - application scope
 - session: javax.servlet.http.HttpSession
     - session scope
-- pageContext: javax.servlet.jsp.PageContext
+- pageContext: javax.servlet.jsp.PageContext(jsp管理者)
     - page scope
 - page: java.lang.Object
     - page scope
@@ -43,14 +43,56 @@ JSP的生命周期是一个将JSP Page转化为Servlet的过程,目的是为了�
 
 > Jsp has 9 implicit objects that we can directly use in jsp. Seven of them are declared as local variable at the start of _jspService() method whereas request and response are part of _jspServie() methond arguement.
 
-### JSP tag
+### JSP scriptlet(脚本)
 
 - <%! code %> scriptlet of declaration tag: that are inserted into the body of the servlet class, outside of any existing methods.
 - <%= Expression %> scriptlet of expression tag: that are evaluated and inserted into the output.
 - <% code %> scriptlet of: thar are inserted into the servlet's service(_jspService) method.
 
-### JSP directive
+### JSP directive(指令)
 
-- <%@ page %>
-- <%@ include file="" %>
-- <%@ taglib uri="" prefix="" %>
+- <%@ directive{attribute=value}* %>
+    - <%@ page %>
+    - <%@ include file="" %>
+    - <%@ taglib uri="" prefix="" %>
+
+### JSP tag(标签/行为)
+
+- <jsp:elements {attribute="value"}* />
+    - <jsp:include />: 与<%@ include file="" %>的不同在于,后者是静态包含(.java),前者是动态包含(.class).
+    - jsp bean行为
+        - <jsp:useBean id="beanName" class="" scope="" />
+        - <jsp:setProperty name="beanName" property="propertyName" value="" />
+        - <jsp:getProperty name="beanName" propertyName="propertyName" />
+    - <jsp:forward />
+        - request.getRequestDispatcher("someServlet").forward(request,response)
+
+### Expression Language(EL)
+
+The EL simplifies the accessibility of data stored in the java bean component, and other objects like request, session, application etc.
+
+- EL implicit object 
+    - pageScope: page scope
+    - requestScope: request scope
+    - sessionScope: session scope
+    - applicationScope: application scope
+    - param: 表示一个请求参数 ${param.username} 等效 request.getParameter("username")
+    - paramValues: 表示一组请求参数 ${paramValues.loves} 等效 request.getParameterValues("username")
+    - header: 表示一个请求头
+    - headerValues: 表示一组请求头
+    - cookie: 获得cookie对象
+    - initParam: web项目初始化参数, servletContext.getInitParameter("xxx")
+    - pageContext: 表示jsp内置对象pageContext,能够获取request等其他jsp内置对象
+
+### JSTL标签库(JSP Standard Tag Library)
+
+JSTL repersents a set of tags to simplify the JSP development.
+
+- 优点
+    - 快速开发
+    - 代码复用
+    - 不使用<%%>标签
+
+JSTL包含多种类型的标签: core,fmt,fn方法库,sql标签库.
+
+标签导入: `<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>`
