@@ -1,5 +1,7 @@
 # JSP & Servlet
 
+## JSP
+
 ### JSP生命周期
 
 JSP的生命周期是一个将JSP Page转化为Servlet的过程,目的是为了处理service request.
@@ -96,3 +98,19 @@ JSTL repersents a set of tags to simplify the JSP development.
 JSTL包含多种类型的标签: core,fmt,fn方法库,sql标签库.
 
 标签导入: `<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>`
+
+---
+
+## Servlet
+
+Servlet is a web componet that is deployed on the server to create dynamic web pages.
+
+> CGI(Common Gateway Interface) enables the web server to call an external program and pass http request information to the external program to process the request.
+
+### Web Service VS Web Application
+
+Web service refers to software, that servers data in any format(xml/json ect.) through some kind of web interface. The inteface can be called API. REST and SOAP are ways to design the API.
+
+Application is the software that is using this API produced by the web service.
+
+In other words, web service is "server" and application is "client". Usually server serves machines and client serve the user.
