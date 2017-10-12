@@ -7,6 +7,9 @@
 - HTML(初级)[上机]
     - 基本语法、标签、声明、属性
     - 标签属于什么元素，内联/内联-块级/块级元素
+        - 块状元素: `<div> <p> <form> <ul> <ol> <table> <h3>...`
+        - 内联元素: `<a> <img> <code> <span> <br> <select> <input>...`
+        - 可变元素: `<button> <map>...`
 - CSS(初级)[上机]
     - 熟悉css基本语法，以及css工作原理
     - 熟练使用css selector 常规选择器class，id,元素，后代，通用，了解选择器的优先级
