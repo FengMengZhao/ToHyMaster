@@ -117,7 +117,7 @@
 
 ### Database Fundamental
 
-[数据库&SQL基础学习](https://github.com/FengMengZhao/ToHyMaster/tree/master/db-fundamental)
+[数据库&SQL基础学习](https://github.com/FengMengZhao/ToHyMaster/tree/master/database-fundamental)
 
 - ACID，NULL，MVCC，约束、概念模型、第三范式、连接
 - 简单的select、insert、update、delete；
