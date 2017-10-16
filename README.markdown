@@ -1,40 +1,38 @@
 # The road to master engineer
 
-- java(初级)-语法
+- java(初级)-语法<span style="color: green">√</span>
     - 标识符、类、接口、继承、重写、重载、装箱、拆箱、枚举、流程控制、异常、循环、字符串、IO、泛型
-- java(初级)-常用类库
+- java(初级)-常用类库<span style="color: green">√</span>
     - io包、lang包、math包、concurrent包、util包
-- HTML(初级)[上机]
+- HTML(初级)[上机]<span style="color: green">√</span>
     - 基本语法、标签、声明、属性
     - 标签属于什么元素，内联/内联-块级/块级元素
         - 块状元素: `<div> <p> <form> <ul> <ol> <table> <h3>...`
         - 内联元素: `<a> <img> <code> <span> <br> <select> <input>...`
         - 可变元素: `<button> <map>...`
-- CSS(初级)[上机]
+- CSS(初级)[上机]<span style="color: green">√</span>
     - 熟悉css基本语法，以及css工作原理
     - 熟练使用css selector 常规选择器class，id,元素，后代，通用，了解选择器的优先级
     - 熟悉浮动，定位，盒模型，背景，字体，颜色等常用属性，能运用css进行页面布局和展现效果图
-- JAVAscript(初级)[上机]
+- JAVAscript(初级)[上机]<span style="color: green">√</span>
     - 熟悉js基本语法，以及js工作原理
     - 了解js的基本数据类型,js操作符，语句，变量
     - 能进行基础的DOM操作（增删改查）和BOM操作
     - 能通过一些事件进行简单的页面交互，例如，点击，双击，鼠标划过等等
-- JSP/Servlet
+- JSP/Servlet<span style="color: green">√</span>
     - JSP编译原理、运行原理
     - JSP内置对象及作用域、JSTL/EL表达式、元素（指令元素、脚本元素、动作元素）
     - Servlet原理、生命周期、配置方式
-- Spring初级
+- Spring初级<span style="color: red">×</span>
     - Spring框架的设计思想，体系结构
     - SpringIOC、AOP的实现机制
     - Spring的IOC、AOP、ORM和WEB容器的使用
     - SpringMVC配置和使用
     - Spring注解
-- git
+- git<span style="color: green">√</span>
     - 熟悉git的使用方法
     - 制作分支以及合并
-- 技术标准[成果]
-    - 了解技术标准文档
-- 设计模式
+- 设计模式<span style="color: yellow">...</span>
     - 设计模式的三大分类、每个分类中包含的设计模式
     - Java中常用设计模式概念、使用场景、优缺点
     - JDK、commons包、公司技术框架中用到的设计模式
