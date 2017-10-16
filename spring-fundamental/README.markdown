@@ -1,3 +1,5 @@
+## Spring初级(2017-Q3-failed 2017-Q4)
+
 ### Description
 
 Spring core is a framework for Dependency Injection, which stems from single responsibility and loose coupling.
@@ -12,3 +14,4 @@ Spring core is a framework for Dependency Injection, which stems from single res
 - Transition 5: Now DispatcherServlet send the model object to ViewResolver to get the acutal view page.
 - Transition 6: Finally DispatcherServlet will pass the Model object to View page to display the result.
 
+### 启动一个Spring(maven)项目需要做什么工作
