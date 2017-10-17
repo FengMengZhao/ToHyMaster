@@ -114,3 +114,25 @@ Web service refers to software, that servers data in any format(xml/json ect.) t
 Application is the software that is using this API produced by the web service.
 
 In other words, web service is "server" and application is "client". Usually server serves machines and client serve the user.
+
+### Servlet的生命周期
+
+- Servlet class is loaded.
+- Servlet instance is created(instantiation).
+- init method is invoked.
+- service method is invoked.
+- destroy method is invoked.
+
+> There is only one instance of the servlet on each node in multi-clustered environment or you can say there is only one instance of each servlet on each JVM machine.
+
+> Servlet is initialized on application startup or at the first time when the servlet is invoked.
+
+> All the servlet instances are destroyed when server is shutting down or an application disposal.
+
+### JSP和Servlet缓存
+
+`页面` <-- `Servlet缓存` <-- `JSP缓存`
+
+JSP页面转换为Servlet后,使用的out对象是JspWriter类型的,所以会先将要发送的数据存入JSP的缓存中,等待JSP输出缓存满了再自动刷新到Servlet输出缓存,等Servlet输出缓存满了,或者程序结束了,就会输出到浏览器中(除非手动out.flush).
+
+
