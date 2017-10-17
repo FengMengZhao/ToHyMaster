@@ -1,4 +1,4 @@
-### JavaScript
+## JavaScript(2017-Q3)
 
 `document.getElementById('ID').innerHTML=''`统一使用单引号.
 `document.getElementById("ID").innerHTML=""`或者统一使用双引号.
