@@ -62,3 +62,42 @@ Bean自我检查组件提供了底层的工具来getting和setting符合JavaBean
 ---
 
 ### Lang
+
+java.lang标准库没有提供关键类足够多的方法,Apache Commons Lang对之进行了扩展.
+
+Lang包提供了一系列java.lang API的扩展,主要是:字符串操作方法,基本数字方法,反射,并发,创建及序列化和系统特征.此外,Lang包包含了java.util.Date的扩展及`hashCode`,`toString`,`equals`等方法的工具类.
+
+> 最新版本包命名为:`org.apache.commons.lang3`
+
+- API
+    - StringUtils
+        - `contains(CharSequence str,CharSequence searchStr)`
+        - `deleteWhitespace(String str)`
+        - `difference(String str1,String str2)`
+        - `endsWith(CharSequence str,CharSequence suffix)`
+        - `getCommonPrefix(String... strs)`
+        - `trim(String str)`
+    - ArrayUtils
+    - ObjectUtils
+    - RandomStringUtils
+    - SerializationUtils
+    - SystemUtils
+
+---
+
+### Collections
+
+Apache Collections致力于在JDK类基础上,提供新的接口,实现和工具.
+
+- Bag interface,集合中有每一个对象的许多copy
+- BidiMap interface,能够从key到value,也能够从value到key查询
+- MapIterator interface,提供Map类简单快速的迭代
+- 转换装饰器,针对要加入集合的对象进行转换
+- 合成多个集合为一个
+- 集合的排序
+- map的key或者value能够在控制下garbage collection
+- 多种比较器的实现
+- 适配数组,enum为collection
+- 集合处理工具(交集,并集,补集)
+
+---
