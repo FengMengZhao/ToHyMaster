@@ -32,5 +32,7 @@ Spring 是一个解决依赖注入(Dependency Injection, DI)或者控制反转(I
 3. 使用反射机制，根据这个字符串获得某个类的Class实例
 4. 动态配置实例的属性
 
-### 启动一个Spring(maven)项目需要做什么工作
+### Eclipse创建一个spring web项目
+
+
 
