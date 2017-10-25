@@ -6,6 +6,7 @@ Spring 是一个解决依赖注入(Dependency Injection, DI)或者控制反转(I
 
 > Spring core is a framework for Dependency Injection, which stems from single responsibility and loose coupling.
 
+---
 
 ### Spring 工作流程
 
@@ -31,6 +32,8 @@ Spring 是一个解决依赖注入(Dependency Injection, DI)或者控制反转(I
 2. Java类里面解析xml或properties里面的内容，得到对应实体类的字节码字符串以及相关的属性信息
 3. 使用反射机制，根据这个字符串获得某个类的Class实例
 4. 动态配置实例的属性
+
+---
 
 ### Eclipse创建一个spring web项目
 
@@ -248,4 +251,14 @@ Spring 是一个解决依赖注入(Dependency Injection, DI)或者控制反转(I
 
 ---
 
+### spring项目源码
 
+**Spring Java项目 - HelloWorld**
+
+[spring java project](/springdemo-helloworld)
+
+**Spring web项目 - He'llWorld**
+
+[Spring web project](/spring-web-demo)
+
+---
