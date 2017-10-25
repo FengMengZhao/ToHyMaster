@@ -18,7 +18,7 @@ Spring 是一个解决依赖注入(Dependency Injection, DI)或者控制反转(I
 3. 前端控制器根据返回的视图名, 选择相应的视图进行渲染, 并将模型数据传入到视图中以便展示.
 4. 前端控制器将响应结果返回给用户.
 
-> - Transition 1: User send request to server by submitting form/ by clicking hyperlink etc. Request is intially givn to web.xml.
+- Transition 1: User send request to server by submitting form/ by clicking hyperlink etc. Request is intially givn to web.xml.
 - Transition 2: web.xml routes request to DispatcherServlet by looking at tag.
 - Transition 3: DispatcherServlet wil take help of HandlerMapping and get to know the controller class name associated with the given request.
 - Transition 4: So request transfer to the controller, and then controller will process the request by executing appropriate method and returns ModelAndView object(contains Model data and View name) back to the DispatcherServlet.
@@ -46,6 +46,67 @@ Spring 是一个解决依赖注入(Dependency Injection, DI)或者控制反转(I
 
 ![maven-project-support](../image/maven-project-support.png)
 
+![config-maven-dependency](../image/config-maven-dependency)
+
 **修改pom文件**
 
-![]
+![springmvc-pom](../image/springmvc-pom.xml)
+
+    <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+      <modelVersion>4.0.0</modelVersion>
+      <groupId>com.fmz.springweb</groupId>
+      <artifactId>spring-web-demo</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <packaging>war</packaging>
+      <name>spring-web-demo</name>
+      <description/>
+      <properties>
+        <webVersion>3.0</webVersion>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <org.springframework.version>4.2.3.RELEASE</org.springframework.version>
+      </properties>
+      <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+        
+      </dependencies>
+      <build>
+        <sourceDirectory>src</sourceDirectory>
+        <resources>
+          <resource>
+            <directory>src</directory>
+            <excludes>
+              <exclude>**/*.java</exclude>
+            </excludes>
+          </resource>
+        </resources>
+        <plugins>
+          <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>2.3.2</version>
+            <configuration>
+              <source>1.7</source>
+              <target>1.7</target>
+            </configuration>
+          </plugin>
+          <plugin>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>2.6</version>
+            <configuration>
+              <warSourceDirectory>${basedir}/web</warSourceDirectory>
+              <failOnMissingWebXml>false</failOnMissingWebXml>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </project>
+
+**修改web.xml文件**
