@@ -110,3 +110,142 @@ Spring 是一个解决依赖注入(Dependency Injection, DI)或者控制反转(I
     </project>
 
 **修改web.xml文件**
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+        <display-name>spring-web-demo</display-name>
+        <welcome-file-list>
+          <welcome-file>index.html</welcome-file>
+          <welcome-file>index.htm</welcome-file>
+          <welcome-file>index.jsp</welcome-file>
+          <welcome-file>default.html</welcome-file>
+          <welcome-file>default.htm</welcome-file>
+          <welcome-file>default.jsp</welcome-file>
+        </welcome-file-list>
+      
+        <context-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:applicationContext.xml</param-value>
+        </context-param>
+        <listener>
+            <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+        </listener>
+        
+        <!-- springmvc前端控制器 -->
+        <servlet>
+            <servlet-name>springmvc</servlet-name>
+            <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+            <init-param>
+                <param-name>contextConfigLocation</param-name>
+                <param-value>classpath:springmvc-servlet.xml</param-value>
+            </init-param>
+            <load-on-startup>1</load-on-startup>
+        </servlet>
+        <servlet-mapping>
+            <servlet-name>springmvc</servlet-name>
+            <!-- 使此前端控制器拦截所有请求 -->
+            <url-pattern>/</url-pattern>
+        </servlet-mapping>
+    </web-app>
+
+**添加applicationContext.xml**
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <beans xmlns="http://www.springframework.org/schema/beans" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xmlns:context="http://www.springframework.org/schema/context"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+                            http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+                            http://www.springframework.org/schema/context
+                            http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+            
+    </beans>
+
+**添加springmvc-servlet.xml**
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <beans xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                            http://www.springframework.org/schema/beans/spring-beans.xsd
+                            http://www.springframework.org/schema/context 
+                            http://www.springframework.org/schema/context/spring-context.xsd">
+        <!-- 处理映射器 -->                   
+        <bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping"></bean>
+        <!-- 处理器适配器 -->
+        <bean class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter"></bean>
+        <!-- 视图解释器 -->
+        <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"></bean>
+        <!-- 定义一个bean, 即处理器(或控制器), 映射"/hello"请求 -->
+        <bean name="/hello" class="com.fmz.springmvc.HelloController"></bean>
+        
+        <!-- spring自动扫描包路径com.fmz.springmvc.controller下的所有包和类 -->
+        <context:component-scan base-package="com.fmz.springmvc"></context:component-scan>   
+        <!-- annotation处理映射器 -->                   
+        <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"></bean>    
+        <!-- annotation处理器适配器 -->
+        <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"></bean>    
+        <!-- 视图解释器 -->
+        <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"></bean>
+    </beans>
+
+**Bean配置的方法-HelloWorldController**
+
+    package com.fmz.springweb.controller;
+
+    import javax.servlet.http.HttpServletRequest;
+    import javax.servlet.http.HttpServletResponse;
+
+    import org.springframework.web.servlet.ModelAndView;
+    import org.springframework.web.servlet.mvc.Controller;
+
+    public class HelloWorldController implements Controller {
+
+        @Override
+        public ModelAndView handleRequest(HttpServletRequest request,
+                HttpServletResponse response) throws Exception {
+            ModelAndView mv = new ModelAndView();
+            mv.addObject("message", "fmz");
+            mv.setViewName("/jsp/hello.jsp");;
+            return mv;
+        }
+        
+    }
+
+> `HttpServletResponse`和`HttpServletRequest`涉及到对JavaEE API的依赖,需要将Tomcat运行时的依赖加入到项目的依赖中: `build path --> add library --> MyEclipse Server Library`
+
+**注解的方法-HelloWorldAnnotationController**
+
+    package com.fmz.springweb.controller;
+
+    import org.springframework.stereotype.Controller;
+    import org.springframework.web.bind.annotation.RequestMapping;
+    import org.springframework.web.servlet.ModelAndView;
+
+
+    @Controller
+    public class HelloWorldAnnotationController{
+
+        private int count = 0;
+        
+        @RequestMapping(value="/count")
+        public ModelAndView count(){
+            ModelAndView mv = new ModelAndView();
+            mv.addObject("message", "count...");
+            mv.setViewName("/jsp/count.jsp");
+            System.out.println(count++);
+            return mv;
+        }
+        
+        @RequestMapping(value="/hi")
+        public ModelAndView hi(String param){
+            ModelAndView mv = new ModelAndView();
+            mv.addObject("message", param);
+            mv.setViewName("/jsp/hi.jsp");
+            return mv;
+        }
+    }
+
+---
+
+
