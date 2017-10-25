@@ -9,7 +9,7 @@ Spring 是一个解决依赖注入(Dependency Injection, DI)或者控制反转(I
 
 ### Spring 工作流程
 
-![spring mvc 工作流程](../image/springmvc.png)
+![spring mvc 工作流程](../image/springmvc-process.png)
 
 **具体处理请求步骤:**
 
@@ -34,5 +34,18 @@ Spring 是一个解决依赖注入(Dependency Injection, DI)或者控制反转(I
 
 ### Eclipse创建一个spring web项目
 
+**新建一个web项目**
 
+![spring-new-web-project](../image/spring-new-web-project.png)
 
+![create-a-javaee-web-project](../image/create-a-javaee-web-project.png)
+
+![conf-output-folder](../image/conf-output-folder.png)
+
+![web-module](../image/web-module.png)
+
+![maven-project-support](../image/maven-project-support.png)
+
+**修改pom文件**
+
+![]
