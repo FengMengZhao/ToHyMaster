@@ -255,10 +255,10 @@ Spring 是一个解决依赖注入(Dependency Injection, DI)或者控制反转(I
 
 **Spring Java项目 - HelloWorld**
 
-[spring java project](/springdemo-helloworld)
+[spring java project](./springdemo-helloworld)
 
 **Spring web项目 - He'llWorld**
 
-[Spring web project](/spring-web-demo)
+[Spring web project](./spring-web-demo)
 
 ---
