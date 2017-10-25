@@ -46,11 +46,11 @@ Spring 是一个解决依赖注入(Dependency Injection, DI)或者控制反转(I
 
 ![maven-project-support](../image/maven-project-support.png)
 
-![config-maven-dependency](../image/config-maven-dependency)
+![config-maven-dependency](../image/config-maven-dependency.png)
 
 **修改pom文件**
 
-![springmvc-pom](../image/springmvc-pom.xml)
+![springmvc-pom](../image/springmvc-pom.png)
 
     <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
       <modelVersion>4.0.0</modelVersion>
