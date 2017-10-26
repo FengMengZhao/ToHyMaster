@@ -32,7 +32,7 @@
 
 ### 7. Spring-开发-初级 × TODO
 
-[Spring学习](https://github.com/FengMengZhao/ToHyMaster/tree/master/spring-fundamental)
+[Spring学习](./spring-fundamental)
 
 - Spring框架的设计思想，体系结构
 - SpringIOC、AOP的实现机制
@@ -42,7 +42,7 @@
 
 ### 8. Java Apache Commons-开发-初级 TODO
 
-[Apache Commons学习](https://github.com/FengMengZhao/ToHyMaster/tree/master/apache-commons)
+[Apache Commons学习](./apache-commons)
 
 - 介绍多个工具的内容以及使用方法
 - 讲解使用的过程和示例
@@ -51,14 +51,16 @@
 
 ### 9. AJAX-开发-初级 TODO
 
-[AJAX学习](https://github.com/FengMengZhao/ToHyMaster/tree/master/ajax)
+[AJAX学习](./ajax)
 
 - 了解基本的原理
 - 会使用ajax编写程序
 
 ### 10. mybatis-开发-初级 TODO
 
-- 掌握mybatis的基础语法、
+[mybatis学习](./mybatis)
+
+- 掌握mybatis的基础语法
 - 至少参与一个使用mybatis的项目
 
 ### 11. 安全开发-开发-初级 TODO
@@ -83,7 +85,7 @@
 
 ### 14. 数据库基础&SQL-通用-初级 TODO TODO
 
-[数据库&SQL基础学习](https://github.com/FengMengZhao/ToHyMaster/tree/master/database-fundamental)
+[数据库&SQL基础学习](./database-fundamental)
 
 - ACID，NULL，MVCC，约束、概念模型、第三范式、连接
 - 简单的select、insert、update、delete；
@@ -145,7 +147,7 @@
 
 ### 2. 类设计-开发-中级 TODO 
 
-[类设计学习](https://github.com/FengMengZhao/ToHyMaster/tree/master/class-design)
+[类设计学习](./class-design)
 
 - 面向对象的基本概念：继承、封装、多态。类、抽象类、接口之间的关系
 - 面向对象的设计原则：单一职责、开-闭、里氏替换、依赖倒置、接口分离、迪米特原则等
@@ -154,7 +156,7 @@
 
 ### 3. Java-开发-中级 TODO
 
-[Java中级学习](https://github.com/FengMengZhao/ToHyMaster/tree/master/java-intermediate)
+[Java中级学习](./java-intermediate)
 
 - 多线程、线程池、线程安全、
 - IO流体系、
@@ -167,7 +169,7 @@
 
 ### 4. 数据库设计-开发-中级 TODO 
 
-[数据库设计学习](https://github.com/FengMengZhao/ToHyMaster/tree/master/database-design)
+[数据库设计学习](./database-design)
 
 - 分库原则、分表原则（垂直、水平）
 - 表设计、冗余设计、字段设计、增量设计、主键生成规则、外键设计、索引设计

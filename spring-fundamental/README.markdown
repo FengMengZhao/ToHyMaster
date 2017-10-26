@@ -6,6 +6,10 @@ Spring 是一个解决依赖注入(Dependency Injection, DI)或者控制反转(I
 
 > Spring core is a framework for Dependency Injection, which stems from single responsibility and loose coupling.
 
+**概览Spring模块**
+
+![Spring Modules](../image/spring-overview.png)
+
 ---
 
 ### Spring 工作流程
@@ -19,7 +23,7 @@ Spring 是一个解决依赖注入(Dependency Injection, DI)或者控制反转(I
 3. 前端控制器根据返回的视图名, 选择相应的视图进行渲染, 并将模型数据传入到视图中以便展示.
 4. 前端控制器将响应结果返回给用户.
 
-- Transition 1: User send request to server by submitting form/ by clicking hyperlink etc. Request is intially givn to web.xml.
+- Transition 1: User send request to server by submitting form/ by clicking hyperlink etc. Request is intially given to web.xml.
 - Transition 2: web.xml routes request to DispatcherServlet by looking at tag.
 - Transition 3: DispatcherServlet wil take help of HandlerMapping and get to know the controller class name associated with the given request.
 - Transition 4: So request transfer to the controller, and then controller will process the request by executing appropriate method and returns ModelAndView object(contains Model data and View name) back to the DispatcherServlet.
@@ -69,6 +73,7 @@ Spring 是一个解决依赖注入(Dependency Injection, DI)或者控制反转(I
         <org.springframework.version>4.2.3.RELEASE</org.springframework.version>
       </properties>
       <dependencies>
+        <!-- spring相关 -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
@@ -79,7 +84,6 @@ Spring 是一个解决依赖注入(Dependency Injection, DI)或者控制反转(I
             <artifactId>spring-webmvc</artifactId>
             <version>${org.springframework.version}</version>
         </dependency>
-        
       </dependencies>
       <build>
         <sourceDirectory>src</sourceDirectory>
@@ -111,6 +115,46 @@ Spring 是一个解决依赖注入(Dependency Injection, DI)或者控制反转(I
         </plugins>
       </build>
     </project>
+
+> 通常在项目中,我们不使用commons-logging依赖做日志输出,而是用slf4j.解除这种依赖关系,需要在pom中加入:
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+               <artifactId>spring-core</artifactId> 
+               <version>4.3.8.RELEASE</version> 
+               <exclusions>
+                <exclusion> 
+                    <groupId>commons-logging</groupId> 
+                    <artifactId>commons-logging</artifactId>
+              </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+> 增加slf4j + logback日志依赖,需要加入pom文件:
+
+    <!-- 日志 -->
+    <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-core</artifactId>
+        <version>1.1.2</version>
+    </dependency>
+    <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>1.1.2</version>
+    </dependency>
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>log4j-over-slf4j</artifactId>
+        <version>1.6.1</version>
+    </dependency>
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jcl-over-slf4j</artifactId>
+        <version>1.6.1</version>
+    </dependency>
 
 **修改web.xml文件**
 
@@ -253,12 +297,7 @@ Spring 是一个解决依赖注入(Dependency Injection, DI)或者控制反转(I
 
 ### spring项目源码
 
-**Spring Java项目 - HelloWorld**
-
-[spring java project](./springdemo-helloworld)
-
-**Spring web项目 - He'llWorld**
-
-[Spring web project](./spring-web-demo)
+- [Spring Java项目 - HelloWorld](./springdemo-helloworld)
+- [Spring web项目 - He'llWorld](./spring-web-demo)
 
 ---
