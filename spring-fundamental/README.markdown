@@ -14,14 +14,28 @@ Spring 是一个解决依赖注入(Dependency Injection, DI)或者控制反转(I
 
 ### Spring 工作流程
 
-![spring mvc 工作流程](../image/springmvc-process.png)
-
 **具体处理请求步骤:**
+
+![spring mvc 工作流程](../image/springmvc-process.png)
 
 1. 用户发送请求, 被前端控制器拦截, 前端控制器根据请求的信息选择相应的页面控制器, 并将请求委托给此页面控制器来处理.
 2. 页面控制器接收到请求后, 首先收集并绑定请求参数到一个命令对象(表单对象)中, 并进行验证转换等操作, 然后将命令对象(表单对象)委托给业务对象进行处理, 最后返回一个ModelAndView对象.
 3. 前端控制器根据返回的视图名, 选择相应的视图进行渲染, 并将模型数据传入到视图中以便展示.
 4. 前端控制器将响应结果返回给用户.
+
+**细说Spring MVC工作流程**
+
+![细说Spring MVC工作流程](../image/springmvc-specific-process.png)
+
+1. DispatcherServlet作为前端控制器, 统一的请求接收点, 控制全局的请求流程. 接收到用户请求, 自己不做处理, 而是将请求委托给其他的处理器进行处理.
+2. DispatcherServlet通过HandlerMapping(处理映射器), 将请求映射为一个HandlerExecutionChain对象, 其中包括了页面控制器和对其配置的拦截器.
+3. DispatcherServlet通过获得的Handler(处理器, 页面控制器, Controller), 查找一个合适的HandlerAdapter(处理器适配器), 通过这个HandlerAdapter调用Handler实际处理请求的方法.
+4. 提取请求中的模型数据, 调用Handler实际处理请求的方法. 在调用方法时, 填充参数过程中, spring会根据配置做一些工作, 如: 数据转换, 数据格式化, 数据验证等.
+5. Handler执行完成后, 将返回一个ModelAndView对象给DispatherServlet. ModelAndView对象中包含逻辑视图名或逻辑视图名和模型.
+6. 根据ModelAndView对象选择一个合适的ViewResolver(视图解析器).
+7. ViewResolver将ModelAndView中的逻辑视图名解释成View对象. ViewResolver也是接口, 同样采用了策略模式, 这样就很容易切换其他的视图类型.
+8. 渲染视图时, 将Model数据传入视图中, 这里的Model数据是一个Map, 容易与各种视图类型相结合.
+9. 最后, 由DispatcherServlet将最终的响应结果返回给用户.
 
 - Transition 1: User send request to server by submitting form/ by clicking hyperlink etc. Request is intially given to web.xml.
 - Transition 2: web.xml routes request to DispatcherServlet by looking at tag.
