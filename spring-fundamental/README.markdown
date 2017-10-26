@@ -312,6 +312,6 @@ Spring 是一个解决依赖注入(Dependency Injection, DI)或者控制反转(I
 ### spring项目源码
 
 - [Spring Java项目 - HelloWorld](./springdemo-helloworld)
-- [Spring web项目 - He'llWorld](./spring-web-demo)
+- [Spring web项目 - HelloWorld](./spring-web-demo)
 
 ---
