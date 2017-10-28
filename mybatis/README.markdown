@@ -171,6 +171,59 @@ Mybatis是一个优秀的持久化框架,它支持定制的SQL,存储过程和�
         }
     }
 
+**无XML通过Java代码获取SQL工厂**
+
+    package com.fmz.test;
+
+    import javax.sql.DataSource;
+
+    import org.apache.ibatis.mapping.Environment;
+    import org.apache.ibatis.session.Configuration;
+    import org.apache.ibatis.session.SqlSession;
+    import org.apache.ibatis.session.SqlSessionFactory;
+    import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+    import org.apache.ibatis.transaction.TransactionFactory;
+    import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
+    import org.apache.commons.dbcp.BasicDataSource;
+    import org.junit.Test;
+
+    import com.fmz.mapping.IUserMapping;
+    import com.fmz.mybatis.User;
+
+    public class TestCURDByAnnotationMapping {
+        
+        @Test
+        public void testAdd(){
+            
+            //不使用xml来获取SQLSessionFactory
+            //创建数据库连接
+            BasicDataSource dataSource = new BasicDataSource();
+            dataSource.setDriverClassName("org.postgresql.Driver");
+            dataSource.setUrl("jdbc:postgresql://172.16.192.194:5432/test");
+            dataSource.setUsername("fmz");
+            dataSource.setPassword("147258");
+            //创建事务工厂
+            TransactionFactory trxFactory = new JdbcTransactionFactory();
+            Environment env = new Environment("dev", trxFactory, dataSource);
+            Configuration config = new Configuration(env);
+            config.addMapper(IUserMapping.class);
+            SqlSessionFactory sessionFactory = new SqlSessionFactoryBuilder().build(config);
+            SqlSession sqlSession = sessionFactory.openSession(true);
+            IUserMapping mapper = sqlSession.getMapper(IUserMapping.class);
+            User user = new User();
+            user.setName("XXX");
+            user.setAge(37);
+            //执行插入操作
+            int retResult = mapper.add(user);
+            //手动提交事务
+            //sqlSession.commit();
+            //关闭SqlSession
+            sqlSession.close();
+            System.out.println("插入操作执行结果: " + retResult);
+        }
+        
+    }
+
 **测试基于xml配置的数据库CURD操作**
 
     package com.fmz.test;
@@ -397,5 +450,56 @@ Mybatis是一个优秀的持久化框架,它支持定制的SQL,存储过程和�
 ---
 
 ### mybatis spring整合
+
+#### 一. 使用maven创建web项目
+
+    mvn archetype:generate -DgroupId=me.gacl -DartifactId=spring4-mybatis3 -DarchetypeArtifactId=maven-archetype-webapp -DinteractiveMode=false
+
+**编辑pom文件**
+
+    <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+      <modelVersion>4.0.0</modelVersion>
+      <groupId>com.fmz.mybatis</groupId>
+      <artifactId>spring4-mybatis3</artifactId>
+      <packaging>war</packaging>
+      <version>1.0-SNAPSHOT</version>
+      <name>spring4-mybatis3</name>
+      <url>http://maven.apache.org</url>
+      <dependencies>
+
+      </dependencies>
+      <build>
+        <finalName>spring4-mybatis3</finalName>
+      </build>
+    </project>
+
+> 修改`<name>spring4-mybatis3 Maven Webapp</name>`部分，把"Maven Webapp"这部分包含空格的内容去掉，否则Maven在编译项目时会因为空格的原因导致一些莫名其妙的错误出现，修改成:<name>spring4-mybatis3</name>.
+
+**将生成的项目导入MyEclipse(Existing Maven Projects)中**
+
+手动创建`src/main/java`,`src/main/resources`,`src/test/java`,`src/test/resources`:
+
+![create source folder](../image/new-source-folder.png)
+
+如果无法创建成功,需要删除build path下的Source:
+
+![delete source](../image/delete-source.png)
+
+创建成功后,如下图所示:
+
+![create source success](../image/create-source-success.png)
+
+#### 二. 创建数据库信息
+
+    create table spring_users(
+        user_id char(32) NOT NULL,
+        user_name varchar(30) DEFAULT NULL,
+        user_birthday date DEFAULT NULL,
+        user_salary NUMERIC DEFAULT NULL,
+        PRIMARY KEY (user_id)
+    );
+
+---
 
 **mybatsi通过配置和spring两种方法实现**
