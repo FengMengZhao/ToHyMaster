@@ -500,6 +500,26 @@ Mybatis是一个优秀的持久化框架,它支持定制的SQL,存储过程和�
         PRIMARY KEY (user_id)
     );
 
----
+#### 三. Mybatis Spring的整合
 
-**mybatsi通过配置和spring两种方法实现**
+`mybatis-spring`将Mybatis和Spring无缝的整合在一起.这个包允许Mybatis参与Spring的事务管理,负责将Mybatis mapper和sqlSession注入到其他bean中,把Mybatis Exception转化为Spring DataAccessException.在pom.xml中加入如下依赖,完成Mybatis Spring的整合:
+
+    <!-- MyBatis integration -->
+    <dependency>
+        <groupId>org.mybatis</groupId>
+        <artifactId>mybatis-spring</artifactId>
+        <version>1.2.1</version>
+    </dependency>
+    <dependency>
+        <groupId>org.mybatis</groupId>
+        <artifactId>mybatis</artifactId>
+        <version>3.2.3</version>
+    </dependency>
+
+**Spring Applicaton Context配置**
+
+Mybatis和Spring整合使用,至少要做两个配置:`sqlSessionFactory`和`mapper interface`.
+
+> `sqlSessionFactory`需要一个dataSource.
+
+---
