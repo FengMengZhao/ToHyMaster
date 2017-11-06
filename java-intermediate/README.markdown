@@ -1,6 +1,16 @@
 # Java中级(2017-Q4)
 
-### Heap dump Analysis
+## 目录
+
+- [Heap dump Anylysis](#1)
+    - [内存溢出实例](#1.1)
+    - [通过工具进行Heap dump](#1.2)
+    - [Java hasCode and equals method](#1.3)
+- [Java多线程](#2)
+
+---
+
+<h3 id = "1">Heap dump Analysis</h3>
 
 Java应用程序要求使用大小有限的共享内存空间,这个限制可以在程序启动的时候指定.为了更加方便应用,逻辑又将之分为堆内存(Heap Space)和方法区(Permanent Generation or Mothod Area).
 
@@ -25,7 +35,7 @@ Java共享内存区域的大小可以在JVM启动的时候可以设定,如果不
 - 程序的使用量或者数据量出现峰值
 - 内存泄漏(Memory Leak)
 
-#### 内存溢出的实例
+<h4 id = "1.1">内存溢出的实例</h4>
 
 **堆内存限制导致内存溢出**
 
@@ -85,7 +95,7 @@ Java共享内存区域的大小可以在JVM启动的时候可以设定,如果不
 - 程序中如果Key类只复写了`hashCode()`方法,而没有`equals()`方法,则程序会无限制的申请Key对象,直到内存溢出.
 - 内存泄漏: 一些程序不再使用的对象不能够被JVM GC识别,而无法回收.上述的内存泄漏问题可以通过复写`equal()`方法解决.
 
-#### 通过工具进行Heap Dump
+<h4 id="1.2">通过工具进行Heap Dump</h4>
 
 查看并分析Java Heap Space有很多方法:
 
@@ -113,9 +123,7 @@ Java共享内存区域的大小可以在JVM启动的时候可以设定,如果不
     - `java <java_app> -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=<output file>.hprof`
     - `jvisualvm`: 将上述文件装入,即可查看运行结束的Java应用堆内存
 
----
-
-### Java hasCode and equals method
+<h4 id = "1.3">Java hasCode and equals method</h4>
 
 - `equals`方法
     - 对于任意的非`null`引用x,`x.equals(x)`应该放回`true`
@@ -172,3 +180,5 @@ Java共享内存区域的大小可以在JVM启动的时候可以设定,如果不
     }
 
 ---
+
+<h3 id="2">Java多线程</h3>
