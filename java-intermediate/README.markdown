@@ -2,11 +2,15 @@
 
 ## 目录
 
-- [Heap dump Anylysis](#1)
-    - [内存溢出实例](#1.1)
-    - [通过工具进行Heap dump](#1.2)
-    - [Java hasCode and equals method](#1.3)
-- [Java多线程](#2)
+- [1. Heap dump Anylysis](#1)
+    - [1.1 内存溢出实例](#1.1)
+    - [1.2 通过工具进行Heap dump](#1.2)
+    - [1.3 Java hasCode and equals method](#1.3)
+- [2. Java多线程](#2)
+    - [2.1 进程 VS 线程](#2.1)
+    - [2.2 线程对象](#2.2)
+    - [2.3 同步(Synchronization)](#2.3)
+    - [2.4 死锁](#2.4)
 
 ---
 
@@ -182,3 +186,196 @@ Java共享内存区域的大小可以在JVM启动的时候可以设定,如果不
 ---
 
 <h3 id="2">Java多线程</h3>
+
+<h4 id="2.1">进程 VS 线程</h4>
+
+**进程:**
+
+一个进程有独立的运行环境.通常情况下,一个进程具有完全私有的基本运行时资源.尤其是,每一个进程有自己独立的内存.
+
+进程也通常被称为程序或应用的代名词.然而,人们普遍认为的进程实际上是相互合作的进程集.操作系统通过管道和套接字等IPC(Inter Process Communication)资源实现同一个系统或不同系统间的交流协作.
+
+**线程:**
+
+线程被称为轻量级的进程.线程和进程都提供程序运行环境,相对于进程,但是创建一个新的线程需要更少的资源.
+
+线程依附于进程存在:每一个进程都至少有一个进程.线程分享进程的资源,包括内存和打开文件.这使得共同更加有效,同时也带来潜在的问题.
+
+Java支持多线程环境是必要的.如果你认为内存管理和信号处理是一个线程,每一个Java应用都至少有一个或者多个线程.但是从开发者的角度,你仅仅从一个线程开始,这个线程是主线程.这个主线程有能力创建其他线程.
+
+<h4 id="2.2">线程对象</h4>
+
+使用Thread Object的两种方式:
+
+- 手动创建线程对象
+    - extends Thread 
+    - new Thread(new Runnable)
+- 将线程的管理抽象,将应用的tasks创递给一个executor
+
+Thread主要方法:
+
+- java.lang.Thread
+    - class method
+        - Thread.currentThread()
+        - Thread.sleep()
+        - Thread.interrupted(): 当前线程是否被interrupted
+        - Threa.yield(): 当前线程暗示可以交出CPU
+    - instance method
+        - new Thread().isInterrupted(): this线程是否被interrupted
+        - new Thread().interrupt(): interrupt this线程
+        - new Thread().join: 当前线程等待this线程,直到this线程结束
+
+**join()方法示例:**
+
+    public class ThreadJoin{
+        private static class PrintInteger implements Runnable{
+            
+            @Override
+            public void run(){
+                for(int i = 0; i < 5; i++){
+                    try{
+                        Thread.sleep(500);
+                    }catch(InterruptedException e){
+                        e.printStackTrace();
+                    }
+                    System.out.println(Thread.currentThread().getName() + " --> " + (i+1));
+                }
+            }
+        }
+
+        public static void main(String args[]){
+
+            Thread t1 = new Thread(new PrintInteger());
+            Thread t2 = new Thread(new PrintInteger());
+            Thread t3 = new Thread(new PrintInteger());
+            t1.start();
+            try{
+                t1.join();
+            }catch(InterruptedException e){
+                e.printStackTrace();
+            }
+            t2.start();
+            t3.start();
+        }
+    }
+
+**使用join让多线程顺序执行:**
+
+    public class ThreadSequence{
+        private static class PrintInteger implements Runnable{
+            
+            @Override
+            public void run(){
+                for(int i = 0; i < 5; i++){
+                    try{
+                        Thread.sleep(500);
+                    }catch(InterruptedException e){
+                        e.printStackTrace();
+                    }
+                    System.out.println(Thread.currentThread().getName() + " --> " + (i+1));
+                }
+            }
+        }
+
+        public static void main(String args[]){
+
+            Thread t1 = new Thread(new PrintInteger());
+            Thread t2 = new Thread(new PrintInteger());
+            Thread t3 = new Thread(new PrintInteger());
+            t1.start();
+            try{
+                t1.join();
+            }catch(InterruptedException e){
+                e.printStackTrace();
+            }
+            t2.start();
+            try{
+                t2.join();
+            }catch(InterruptedException e){
+                e.printStackTrace();
+            }
+            t3.start();
+        }
+    }
+
+<h4 id="2.3">同步(Synchronization)</h4>
+
+线程间的交流主要是通过共享域和引用对象的访问完成.这种方式的交流非常有效,同时也会带来两种方面的问题:**线程干扰(thread interference)**和**内存一致性(memory consistency errors)**.要解决这些问题,就需要用到同步.
+
+当两个或者多个线程同时访问相同的资源的时候,同步会引起线程竞争(thread contention),这样会导致JVM执行线程速度变慢,甚至挂起运行.饿死(Stavation)和活锁(livelock)是两种常见的线程竞争的形式.
+
+Java提供了两种基本的同步用法:
+
+- synchronize method
+- synchronize statement
+
+Synchronized同步方法能够阻止线程干扰和内存一致性的问题.
+
+**内置锁(intrinsic lock)**
+
+每一个对象都有一个内置锁与之相关联.通常,一个线程如果想长期独占对一个对象的访问,则这个线程必须首先获得这个对象的内置锁,并且在结束的时候释放锁.从线程获取一个对象的锁开始到释放这个锁的过程叫做:这个对象拥有这个锁.只要一个线程拥有一个对象的内置锁,其他线程没有办法或者该对象的内置锁,而试图获取该对象内置锁的线程就会处于block状态.
+
+**原子访问(Atomic Access)**
+
+在程序中,原子操作一次性执行完成: 原子操作不会中途停止,要么完全执行,要么没有执行.
+
+常见原子操作:
+
+- 对引用变量及大部分基本数据类型(long,double除外)的读和写操作是原子性的
+- 多所有`volatile`修饰的所有变量(包括long,double)的读和写操作是原子性的
+
+<h4 id="2.4">死锁(deadlock)</h4>
+
+**死锁示例:**
+
+    public class DeadLock{
+
+        static class Friend{
+            private String name;
+
+            public Friend(String name){
+                this.name = name;
+            }
+
+            public String getName(){
+                return name;
+            }
+            
+            public synchronized void bow(Friend another){
+                System.out.println(name + "向" + another.getName() + "鞠躬.");
+                another.bowBack(this);
+            }
+
+            public synchronized void bowBack(Friend another){
+                System.out.println(name + "向" + another.getName() + "回礼.");
+            }
+        }
+
+        public static void main(String args[]){
+            final Friend f1 = new Friend("张三");
+            final Friend f2 = new Friend("李四");
+            new Thread(new Runnable(){
+                public void run(){
+                    f1.bow(f2);
+                }
+            }).start();
+            new Thread(new Runnable(){
+                public void run(){
+                    f2.bow(f1);
+                }
+            }).start();
+        }
+    }
+
+> 张三和李四是懂礼貌的好朋友,当他们碰到对方时要向对方鞠躬并且直到对方做出回应方可起身.可是,当他们同时向对方鞠躬的时候,死锁就发生了.
+
+> 要尽量避免在同步块中执行执行其他对象的方法,以为这样容易引起Liveness问题.
+
+- Liveness
+    - 饿死(Starvation): 当一个线程不能够获得对共享数据的访问,并且不能有所进展的情形.
+    - 活锁(Livelock): 当一个线程回应另一个线程的同时,另一个线程同时回应前一个线程.
+
+> 活锁和死锁一样,程序不能够继续执行,但不同的是活锁中的线程处于繁忙状态,并没有处于block状态.
+
+<h4 id="2.5">wait and notify</h4>
+
