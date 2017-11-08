@@ -11,6 +11,7 @@
     - [2.2 线程对象](#2.2)
     - [2.3 同步(Synchronization)](#2.3)
     - [2.4 死锁](#2.4)
+    - [2.5 Guarded Block](#2.5)
 
 ---
 
@@ -377,5 +378,32 @@ Synchronized同步方法能够阻止线程干扰和内存一致性的问题.
 
 > 活锁和死锁一样,程序不能够继续执行,但不同的是活锁中的线程处于繁忙状态,并没有处于block状态.
 
-<h4 id="2.5">wait and notify</h4>
+<h4 id="2.5">Guarded Block</h4>
 
+线程之间需要协作对方的行为.最常用的一种协作方式是`Guarded Block`,这个block循环一个条件,当这个条件为`true`时,block才能继续执行.
+
+    public void guardedJoy() {
+        // Simple loop guard. Wastes
+        // processor time. Don't do this!
+        while(!joy) {}
+        System.out.println("Joy has been achieved!");
+    }
+
+这样的代码虽然满足了`Guarded Block`的要求,但是浪费资源.在`while`循环中,线程在等待时还一直处于工作状态(消耗CPU).
+
+通常我们用同步中`wait`和`notify`解决上述问题:
+
+    public synchronized void guardedJoy() {
+        // This guard only loops once for each special event, which may not
+        // be the event we're waiting for.
+        while(!joy) {
+            try {
+                wait();
+            } catch (InterruptedException e) {}
+        }
+        System.out.println("Joy and efficiency have been achieved!");
+    }
+
+> 为什么`wait`和`notify`是`java.lang.Object`中的方法,而不放入`java.lang.Thread`中?这是因为: 不同的线程是通过获取对象的内置锁的方式来进行独占访问的;对象在线程间进行共享,线程彼此之间并不知道对方的信息,通过对象锁状态的改变可以让线程等待和通知线程竞争,而一个线程无法通知另一个线程.举例来说:火车上的人上厕所,当人发现指示灯是绿色的时候会尝试开门进入厕所,而指示灯是红色的时候,会坐回原位置等待.这里的人相当于线程,厕所相当于对象,指示灯相当于对象的内置锁.指示灯颜色的转变是通过厕所(对象)门反锁与否来完成的,是对象发出的行为,而不是线程(人)发出的行为.
+
+---
