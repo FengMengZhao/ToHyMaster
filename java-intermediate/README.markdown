@@ -12,6 +12,8 @@
     - [2.3 同步(Synchronization)](#2.3)
     - [2.4 死锁](#2.4)
     - [2.5 Guarded Block](#2.5)
+    - [2.6 不可更改(Immutable)对象](#2.6)
+    - [2.7 并发进阶](#2.7)
 
 ---
 
@@ -405,5 +407,454 @@ Synchronized同步方法能够阻止线程干扰和内存一致性的问题.
     }
 
 > 为什么`wait`和`notify`是`java.lang.Object`中的方法,而不放入`java.lang.Thread`中?这是因为: 不同的线程是通过获取对象的内置锁的方式来进行独占访问的;对象在线程间进行共享,线程彼此之间并不知道对方的信息,通过对象锁状态的改变可以让线程等待和通知线程竞争,而一个线程无法通知另一个线程.举例来说:火车上的人上厕所,当人发现指示灯是绿色的时候会尝试开门进入厕所,而指示灯是红色的时候,会坐回原位置等待.这里的人相当于线程,厕所相当于对象,指示灯相当于对象的内置锁.指示灯颜色的转变是通过厕所(对象)门反锁与否来完成的,是对象发出的行为,而不是线程(人)发出的行为.
+
+**Wait & Notify实现Producer-Consumer Model:**
+
+*示例一:同一个对象中有两个同步分发,该对象锁实现wait-notify*
+
+    import java.util.Vector;
+
+    public class Producer extends Thread{
+
+        static final int MAXQUEUE = 5;
+        private Vector<String> messages = new Vector<String>();
+
+        @Override
+        public void run(){
+            try{
+                while(true){
+                    putMessage();
+                }
+            }catch(InterruptedException e){
+               e.printStackTrace();
+            }
+        }
+
+        private synchronized void putMessage() throws InterruptedException{
+            while(messages.size() == MAXQUEUE){
+                wait();
+            }
+            messages.addElement(new java.util.Date().toString());
+            System.out.println( Thread.currentThread().getName() + " --> put messages");
+            notify();
+        }
+
+        public synchronized String getMessage() throws InterruptedException{
+            notify();
+            while(messages.size() == 0){
+                wait();
+            }
+            String message = messages.firstElement();
+            messages.removeElement(message);
+            return message;
+        }
+
+    }
+
+> 生产者线程类,有产生消息的方法,也有消费消息的方法.生产和消费消息的方法都是同步的.生产者类线程负责生产消息.
+
+    public class Consumer extends Thread{
+        Producer producer;
+
+        public Consumer(Producer p){
+            producer = p;
+        }
+
+        @Override
+        public void run(){
+            try{
+                while(true){
+                    String message = producer.getMessage();
+                    System.out.println(Thread.currentThread().getName() + " --> Got message: " + message);
+                }
+            }catch(InterruptedException e){
+                e.printStackTrace();
+            }
+        }
+        
+
+        public static void main(String args[]) throws InterruptedException{
+            Producer producer =  new Producer();
+            producer.start();
+            new Consumer(producer).start();
+        }
+    }
+
+> 消费者类,持有一个生产者对象,消费者线程负责消费消息.二者能够完成消息的自动生成和消费.
+
+*示例二:生产者和消费者持有Message对象,Message对象有生产和消费消息的同步方法,该对象实现wait-notify*
+
+    import java.util.Vector;
+
+    public class Message{
+
+        private Vector<String> messages;
+        private int size;
+
+        public Message(Vector<String> msgs, int size){
+            messages = msgs;
+            this.size = size;
+        }
+
+        public synchronized void putMsg(String msg) throws InterruptedException{ 
+            while(messages.size() == size){
+                System.out.println("Vector is full, " + Thread.currentThread().getName() + " is waiting, size: " + messages.size());
+                wait();
+            }
+            messages.addElement(msg);
+            System.out.println(Thread.currentThread().getName() + " --> put message: " + msg + ";vector: " + messages);
+            notify();
+        }
+
+        public synchronized String getMsg() throws InterruptedException{
+            notify();
+            while(messages.size() == 0){
+                System.out.println("Vector is empty, " + Thread.currentThread().getName() + " is waiting, size: " + messages.size());
+                wait();
+            }
+            String message = messages.firstElement();
+            messages.removeElement(message);
+            System.out.println(Thread.currentThread().getName() + " --> get message: " + message + ";vector: " + messages);
+            return message;
+        }
+    }
+
+> Message类,有生产和消费消息的同步方法,用次对象完成消息的生成和消费.
+
+    import java.util.Vector;
+
+    public class ProducerMessage extends Thread{
+        
+        private Message message;
+
+        public ProducerMessage(Message msg){
+            message = msg;
+        }
+
+       @Override 
+       public void run(){
+           try{
+               for(int i = 0; i < 10; i++){
+                   message.putMsg("" + i);
+               }
+           }catch(InterruptedException e){
+               e.printStackTrace();
+           }
+       }
+    }
+
+> 生产者线程,负责生产消息.
+
+    import java.util.Vector;
+
+    public class ProducerMessage extends Thread{
+        
+        private Message message;
+
+        public ProducerMessage(Message msg){
+            message = msg;
+        }
+
+       @Override 
+       public void run(){
+           try{
+               for(int i = 0; i < 10; i++){
+                   message.putMsg("" + i);
+               }
+           }catch(InterruptedException e){
+               e.printStackTrace();
+           }
+       }
+    }
+
+> 消费者线程类,负责消费消息.
+
+    import java.util.Vector;
+
+    public class ProducerConsumer{
+
+        public static void main(String args[]){
+            Message msg = new Message(new Vector<String>(), 5);
+            ProducerMessage pm = new ProducerMessage(msg);
+            ConsumerMessage cm = new ConsumerMessage(msg);
+            pm.start();
+            cm.start();
+            ProducerMessage pm2 = new ProducerMessage(msg);
+            ConsumerMessage cm2 = new ConsumerMessage(msg);
+            pm2.start();
+            cm2.start();
+        }
+    }
+
+> main()方法类
+
+*示例三:对集合进行同步,完成wait-notify*
+
+    import java.util.Vector;
+
+    public class ProducerVector extends Thread{
+        
+        private Vector<String> messages;
+        private int size;
+
+        public ProducerVector(Vector<String> messages, int size){
+            this.messages = messages;
+            this.size = size;
+        }
+
+       @Override 
+       public void run(){
+           try{
+               for(int i = 0; i < 10; i++){
+                   String msg = "" + i;
+                   putMsg(msg);
+               }
+           }catch(InterruptedException e){
+               e.printStackTrace();
+           }
+       }
+
+       private void putMsg(String msg) throws InterruptedException{
+           while(messages.size() == size){
+               synchronized(messages){
+                   System.out.println("Vector is full, " + Thread.currentThread().getName() + " is waiting, size = " + messages.size());
+                   messages.wait();
+               }
+           }
+           synchronized(messages){
+               messages.addElement(msg);
+               System.out.println(Thread.currentThread().getName() + " --> put message: " + msg + ", vector: " + messages);
+               messages.notify();
+           }
+       }
+
+    }
+
+> 生产者类,对Vector进行同步.
+
+    import java.util.Vector;
+
+    public class ConsumerVector extends Thread{
+        
+        private Vector<String> messages;
+
+        public ConsumerVector(Vector<String> messages){
+            this.messages = messages;
+        }
+
+       @Override 
+       public void run(){
+           try{
+               for(int i = 0; i < 10; i++){
+                    getMsg();
+               }
+           }catch(InterruptedException e){
+               e.printStackTrace();
+           }
+       }
+
+       private String getMsg() throws InterruptedException{
+           while(messages.size() == 0){
+               synchronized(messages){
+                   System.out.println("Vector is empty, " + Thread.currentThread().getName() + " is waiting, size = " + messages.size());
+                   messages.wait();
+               }
+           }
+           synchronized(messages){
+               String msg = messages.firstElement();
+               messages.removeElement(msg);
+               System.out.println(Thread.currentThread().getName() + " --> consume message: " + msg + ", vector: " + messages);
+               messages.notify();
+               return msg;
+           }
+       }
+
+    }
+
+> 消费者类,对Vector进行同步.
+
+    import java.util.Vector;
+
+    public class ProducerConsumerSolution{
+
+        public static void main(String args[]){
+            Vector<String> v = new Vector<String>();
+            ProducerVector pv = new ProducerVector(v, 5);
+            ConsumerVector cv = new ConsumerVector(v);
+            pv.start();
+            cv.start();
+        }
+    }
+
+> main()方法类
+
+
+<h4>2.6 不可更改(Immutable)对象](#2.6)</h4>
+
+如果一个对象创建之后,它的状态(state)就不能别修改,我们称之为`Immutable Object`.在并发的应用中,Immutable对象显得尤为重要.
+
+*示例: 对Mutable对象同步*
+
+    public class SynchronizedRGB {
+
+        // Values must be between 0 and 255.
+        private int red;
+        private int green;
+        private int blue;
+        private String name;
+
+        private void check(int red,
+                           int green,
+                           int blue) {
+            if (red < 0 || red > 255
+                || green < 0 || green > 255
+                || blue < 0 || blue > 255) {
+                throw new IllegalArgumentException();
+            }
+        }
+
+        public SynchronizedRGB(int red,
+                               int green,
+                               int blue,
+                               String name) {
+            check(red, green, blue);
+            this.red = red;
+            this.green = green;
+            this.blue = blue;
+            this.name = name;
+        }
+
+        public void set(int red,
+                        int green,
+                        int blue,
+                        String name) {
+            check(red, green, blue);
+            synchronized (this) {
+                this.red = red;
+                this.green = green;
+                this.blue = blue;
+                this.name = name;
+            }
+        }
+
+        public synchronized int getRGB() {
+            return ((red << 16) | (green << 8) | blue);
+        }
+
+        public synchronized String getName() {
+            return name;
+        }
+
+        public synchronized void invert() {
+            red = 255 - red;
+            green = 255 - green;
+            blue = 255 - blue;
+            name = "Inverse of " + name;
+        }
+    }
+
+当我们使用的时候,就要用到下面的同步方法:
+
+    synchronized (color) {
+        int myColorInt = color.getRGB();
+        String myColorName = color.getName();
+    } 
+
+我们可以试图设计一个Immutable类,避免上述繁琐的同步操作:
+
+    final public class ImmutableRGB {
+
+        // Values must be between 0 and 255.
+        final private int red;
+        final private int green;
+        final private int blue;
+        final private String name;
+
+        private void check(int red,
+                           int green,
+                           int blue) {
+            if (red < 0 || red > 255
+                || green < 0 || green > 255
+                || blue < 0 || blue > 255) {
+                throw new IllegalArgumentException();
+            }
+        }
+
+        public ImmutableRGB(int red,
+                            int green,
+                            int blue,
+                            String name) {
+            check(red, green, blue);
+            this.red = red;
+            this.green = green;
+            this.blue = blue;
+            this.name = name;
+        }
+
+
+        public int getRGB() {
+            return ((red << 16) | (green << 8) | blue);
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public ImmutableRGB invert() {
+            return new ImmutableRGB(255 - red,
+                           255 - green,
+                           255 - blue,
+                           "Inverse of " + name);
+        }
+    }
+
+- 类被定义为`final`
+- 所有的字段定义为`final`
+- 删除了`set`方法,不能有改变对象的状态
+- 如果要改变对象状态,除非新生成一个对象
+
+> 这样,再使用这个对象的时候,就不用一些同步的操作了.
+
+<h4 id="2.7">并发进阶</h4>
+
+**Lock Object**
+
+*TODO...*
+
+**Executors**
+
+当项目的规模变大时,将线程从创建和管理从应用中隔离出来,这时候要用的`Executor`.
+
+*Executor接口:*
+
+- `Executor`: 支持部署任务的简单接口.
+    - `executor.execute(new runnable(){...})`
+- `ExecutorService`: `Executor`的子接口,增加`Executor`的功能并且帮助管理独立任务和`executor`本身.
+    - `Feature submit(new Callable())`
+- `ScheduledExecutorService`: `ExecutorService`的子接口,支持预期和周期执行任务.
+    - schedule
+
+*线程池:*
+
+- ThreadPool
+    - fixed thread pool    
+        - `newFixedThreadPool`
+        - 有固定的Thread对象组成,一个对象停止了工作,其他对象自动顶替上来
+    - cached thread pool(可扩容)
+        - `newCachedThreadPool`
+    - single thread exceutor
+        - `newSingleThreadExecutor`
+
+*并发类集:*
+
+- Concurrent Collections
+    - `BlockingQueue`: 定义一个先来后到的数据结构,当试图插入一个满的队列或者从空队列中取数据时阻塞或者timeout
+    - `ConcurrentMap`: 插入和删除操作是原子性的.标准的实现是`ConcurrentHashMap`,`ConcurrentHashMap`是`HashMap`的线程安全版本
+    - `ConcurrentNavigableMap`: 是`ConcurrentMap`的子接口,支持近似匹配.标准的实现是`ConcurrentSkipListMap`,`ConcurrentSkipListMap`是`TreeMap`的线程安全版本
+
+**原子性变量(Atomic Variables)**
+
+- Atomic Variables
+    - `AtomicInteger`
 
 ---
