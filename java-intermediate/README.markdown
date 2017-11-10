@@ -2,195 +2,223 @@
 
 ## 目录
 
-- [1. Heap dump Anylysis](#1)
-    - [1.1 内存溢出实例](#1.1)
-    - [1.2 通过工具进行Heap dump](#1.2)
-    - [1.3 Java hasCode and equals method](#1.3)
-- [2. Java多线程](#2)
-    - [2.1 进程 VS 线程](#2.1)
-    - [2.2 线程对象](#2.2)
-    - [2.3 同步(Synchronization)](#2.3)
-    - [2.4 死锁](#2.4)
-    - [2.5 Guarded Block](#2.5)
-    - [2.6 不可更改(Immutable)对象](#2.6)
-    - [2.7 并发进阶](#2.7)
+- [1. Java思想](#1)
+    - [1.1 面向对象 VS 面向过程](#1.1)
+    - [1.2 抽象(Abstraction),封装(Encapsulation),协作(Cohesion)](#1.2)
+- [2. Java类集框架](#2)
+- [3. Java I/O流体系](#3)
+    - [3.1 字节流(Byte Stream)](#3.1)
+    - [3.2 字符流(Character Stream)](#3.2)
+    - [3.3 Buffered Stream](#3.3)
+- [4. Java多线程](#4)
+    - [4.1 进程 VS 线程](#4.1)
+    - [4.2 线程对象](#4.2)
+    - [4.3 同步(Synchronization)](#4.3)
+    - [4.4 死锁](#4.4)
+    - [4.5 Guarded Block](#4.5)
+    - [4.6 不可更改(Immutable)对象](#4.6)
+    - [4.7 并发进阶](#4.7)
+- [5. JVM内存模型](#5)
+- [6. Heap dump Anylysis](#6)
+    - [6.1 内存溢出实例](#6.1)
+    - [6.2 通过工具进行Heap dump](#6.2)
+    - [6.3 Java hasCode and equals method](#6.3)
 
 ---
 
-<h3 id = "1">Heap dump Analysis</h3>
+<h3 id="1">1. Java思想</h3>
 
-Java应用程序要求使用大小有限的共享内存空间,这个限制可以在程序启动的时候指定.为了更加方便应用,逻辑又将之分为堆内存(Heap Space)和方法区(Permanent Generation or Mothod Area).
+Java是一个面向对象的编程语言.面向对象是一种看待世界的世界观,这种世界观通过抽象(类和对象的形式)来对真实的世界进行建模.一个Java应用程序是一系列对象的合集,一个对象能够传递消息,接受消息和处理数据,对象之间通过传递消息的方式来请求服务.面向对象的编程范式旨在提高程序的灵活性和可扩展性.
 
-Java共享内存区域的大小可以在JVM启动的时候可以设定,如果不显示的设定参数值,JVM会使用默认值.
+<h4 id="1.1">1.1 面向对象 VS 面向过程</h4>
 
-- JVM 默认Heap Size查看方法:
-- `java -XX:+PrintFlagsFinal -version | findstr HeapSize`
-- `java -XX:+PrintFlagsFinal -version | grep HeapSize`
-- 常用JVM启动参数:
-- `-Xms <heap size> [g|m|k] -Xmx <heap size> [g|m|k]`
-- `-XX:PermSize=<per gen size> [g|m|k] -XX:MaxPermSize=<perm gen size> [g|m|k]`
-- `-Xmn <young size> [g|m|k]`
-- `-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=<output file>.hprof`
-- `java -XX:+PrintFlagsFinal -version`
+面向对象的程序是由模块组成,模块可以进行分别开发和测试,然后整合到整个应用或者从整个应用中去除.
 
-当Java应用程序试图在堆上申请更多的空间,但是设定的内存空间不足时就会引起`java.lang.OutOfMemoryError`.
+面向过程的编程方式也被称为`自上而下`的设计.当你设计自己模型时,首先会有一个主要的问题,这个问题可能以要有一些子问题来解决,直到某个子问题可能独立的完成任务为止.这种编程模式的主要缺点是软件的维护成本大而且费时.当我们主问题的逻辑发生改变的时候,这种逻辑会传递性的影响到金字塔格局中的各个子问题.
 
-> 物理机的内存空间可能是充足的,但是当堆内存达到上限的时候就会抛出`java.lang.outOfMemoryError`.
+**面向过程示例:**
 
-正常情况下,当Java应用程序运行需要比堆上限更对的内存的时候,就会出现异常.这个时候,我们需要重新设定JVM的Heap Space limit.同时,由于程序上的一些错误或者复杂的情况下,也可能发生内存溢出的异常:
+- 主流电商网站爬虫(php)
+    - 模拟http请求,得到HTML页面
+    - 解析HTML页面,匹配正则表达式,提取关键目标标签信息
+    - 依据关键目标信息,重新向相关页面做http请求,得到完整信息
+    - 将完整信息插入数据
 
-- 程序的使用量或者数据量出现峰值
-- 内存泄漏(Memory Leak)
+- 弊端
+    - 各电商反爬虫策略不同,比如说cookie验证,验证码校验等
+    - 电商页面标签和分页规则不尽一致,匹配的正则表达式要相应的改变
+    - 有些关键信息动态生成等,还需要动态请求js信息
 
-<h4 id = "1.1">内存溢出的实例</h4>
+- 应用面向对象
+    - 将HttpRequest抽象为一个类
+        - 针对电商反爬虫策略,有不同的实现,如CookieHttpRequest,PeriodHttpRequest
+    - 将ParsePage抽象为一个类,封装正则规则和Parse策略
+        - 如SimpleLoopParse,WithJsPase等
 
-**堆内存限制导致内存溢出**
+<h4 id="1.2">1.2 抽象(Abstraction),封装(Encapsulation),协作(Cohesion)</h4>
 
-    class OMM{
+面向对象语言的三要素:
 
-        static final int size = 2*1024*1024;
-        public static void main(String args[]){
-            int[] i = new int[size];
-        }
-    }
+- 封装
+- 继承
+- 多态
 
-> `java OMM -Xmx12m` 会导致内存溢出;`java OMM -Xmx13m`则不会出现内存溢出.
+这是语言级别的.更广泛一点,可以理解为:
 
-**内存泄漏导致内存溢出**
+- 抽象
+- 封装
+- 复用
 
-    import java.util.*;
+对应到现实世界,可以理解为:
 
-    public class MemoryLeak{
-
-        static class Key{
-            Integer id;
-
-            Key(Integer id){
-                this.id = id;
-            }
-
-            @Override
-            public int hashCode(){
-                return id.hashCode();
-            }
-
-            /*
-            @Override
-            public boolean equals(Object o){
-                boolean response = false;
-                if(o instanceof Key){
-                    response = (((Key)o).id).equals(this.id);
-                }
-                return response;
-            }
-            */
-        }
-
-        public static void main(String args[]){
-            Map<Key, String> m = new HashMap<Key, String>();
-
-            while(true){
-                for(int i = 0; i < 10000; i++){
-                    if(!m.containsKey(new Key(i))){
-                        m.put(new Key(i), "Nuumber: " + i);
-                    }
-                }
-            }
-        }
-    }
-
-- 程序中如果Key类只复写了`hashCode()`方法,而没有`equals()`方法,则程序会无限制的申请Key对象,直到内存溢出.
-- 内存泄漏: 一些程序不再使用的对象不能够被JVM GC识别,而无法回收.上述的内存泄漏问题可以通过复写`equal()`方法解决.
-
-<h4 id="1.2">通过工具进行Heap Dump</h4>
-
-查看并分析Java Heap Space有很多方法:
-
-- `jmap(java Memory Map),jhat(java Heap analysis tool)`
-- `jvisualvm`
-- `Plumbr`
-- `IBM HeapAnalyzer`
-- `Eclipse MAT(Memory Analysis Tool)`
-
-**通过Jmap和jhat分析堆内存**
-
-- `jps -lm`: 列出正在运行的Java进程和进程号
-    - `jps`工具在jdk1.6的版本中有
-- `jmap -dump:format=b,file=<some_file>.bin <java_process_num>`
-    - 命令格式可以通过`jmap -help`得到
-- `jhat <some_file>.bin`
-    - 启动一个本地服务:`http://127.0.0.1:7000`,访问即可
-
-**通过jvisualvm分析堆内存**
-
-- 正在运行的应用
-    - `jvisualvm`: 自动监控本地的Java应用
-        - 右键java进程,选择Heap Dump可以查看堆内存实时状态
-- 执行结束的应用
-    - `java <java_app> -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=<output file>.hprof`
-    - `jvisualvm`: 将上述文件装入,即可查看运行结束的Java应用堆内存
-
-<h4 id = "1.3">Java hasCode and equals method</h4>
-
-- `equals`方法
-    - 对于任意的非`null`引用x,`x.equals(x)`应该放回`true`
-    - 对于任意的非`null`引用x y,如果`x.equals(y)`放回true,`y.equals(x)`也应该返回`true`
-    - 对于任意的非`null`引用x y,如果`x.equals(y)`为`true`,`y.equals(z)`为`true`,则`x.equals(z)`应该返回`true`
-    - 多次调用的返回结果应该保持一致性
-    - 对于任意非`null`引用x,`x.equals(null)`应该返回false
-- `hashCode`方法
-    - 在一次的Java运行过程中,一个对象的`hashCode`的返回结果应该保持一致性;多个Java运行实例中一个对象的`hashCode`结果没必要保持一致性.
-    - 如果两个对象equals,则这两个对象必须有相等的hashCode
-    - 如果两个对象有相等的hashCode,则这两个对象未必equals;也就是说非equals的对象,也可能有相等的hashCode
-        - 虽然不equals的对象不要求有不同的hashCode,但如果不同对象对应不同的hashCode,则能够提供性能
-
-**覆写equals方法必须覆写hashCode方法**
-
-    import java.util.*;
-
-    public class Apple{
-
-        private String color;    
-
-        public Apple(String color){
-            this.color = color;
-        }
-
-        @Override
-        public boolean equals(Object obj){
-            if(null == obj){
-                return false;
-            }
-            if(! (obj instanceof Apple)){
-                return false;
-            }
-            if(obj == this){
-                return true;
-            }
-            return color.equals(((Apple)obj).color);
-        }
-
-        /*
-        @Override
-        public int hashCode(){
-            return color.hashCode();
-        }
-        */
-
-        public static void main(String args[]){
-
-            Map<Apple, Integer> appleMap = new HashMap<Apple, Integer>();
-            appleMap.put(new Apple("red"), 1);
-            appleMap.put(new Apple("green"), 2);
-            System.out.println(appleMap.get(new Apple("green")));
-        }
-    }
+- 角色
+    - 抽象(Abstraction): 是一个一般化(generalization)的过程.代表了事物的必要信息,而没有具体的实现细节.抽象是一种实现的隐藏(Implementation hiding).
+- 职责
+    - 封装(Encapsulation): 将事物的状态和对状态的操作整合为一个对象,并且严格限制外部对对象某些特征的访问.也就是说,将事物的内在表示从外部世界对它的定义中隐藏起来.封装是一种信息的隐藏(Informatica hiding).
+- 协作
+    - 复用: 角色间有继承,关联和依赖等关系,相互间约束和交流,有序的进行
+    - 抽象和封装是多多态的基石,多态(Polymorphism)是复用的一种
 
 ---
 
-<h3 id="2">Java多线程</h3>
+<h3 id="2">2. Java类集框架</h3>
 
-<h4 id="2.1">进程 VS 线程</h4>
+**Java类集框架UML类图**
+
+![Java类集框架UML类图](../image/java-collections-framework.png)
+
+---
+
+<h3 id="3">3. Java IO流体系</h3>
+
+I/O分别表示输入源(InputStream)和输出头(OutputStream),I/O可以表示各个不同类型的源和头,包括磁盘文件,设备,其他应用程序和数组等.
+
+I/O流可以支持多种类型的数据: 字节(byte),基本数据类型,本地字符和对象.一些流仅仅使用来传递数据,而一些是操控并传输这些数据.
+
+不管流的内部事怎么样的实现,`InputStream`从输入源读取数据,`OutputStream`将流输出到输出头中.
+
+<h4 id="3.1">3.1 字节流(Byte Stream)</h4>
+
+字节流用来读取和输出8-bit的字节(byte).所有的字节流都继承自`InputStream`和`OutputStream`.
+
+*使用字节流读并写文件:*
+
+    import java.io.FileInputStream;
+    import java.io.FileOutputStream;
+    import java.io.IOException;
+
+    public class CopyBytes {
+        public static void main(String[] args) throws IOException {
+
+            FileInputStream in = null;
+            FileOutputStream out = null;
+
+            try {
+                in = new FileInputStream("xanadu.txt");
+                out = new FileOutputStream("outagain.txt");
+                int c;
+
+                while ((c = in.read()) != -1) {
+                    out.write(c);
+                }
+            } finally {
+                if (in != null) {
+                    in.close();
+                }
+                if (out != null) {
+                    out.close();
+                }
+            }
+        }
+    }
+
+> 流读取或者输出完毕,不用时,一定要记得关闭流(finally);当文件不存在或者无法打开文件时,流仍为`null`,所以在关闭流前要做一个非空判断.
+
+> 字节流代表了一种比较底层的I/O流,像上述读取字符文件,我们最好不用字节流,而是用字符流.
+
+<h4 id="3.1">3.2 字符流(Character Stream)</h4>
+
+Java语言的默认编码方式是:`UTF-16`.字符流自动将本地字符进行内部转化或者由内部转为本地字符.所有的字符流都继承自`Reader`和`Writter`
+
+*使用字符流读并写文件:*
+
+    import java.io.FileReader;
+    import java.io.FileWriter;
+    import java.io.IOException;
+
+    public class CopyCharacters {
+        public static void main(String[] args) throws IOException {
+
+            FileReader inputStream = null;
+            FileWriter outputStream = null;
+
+            try {
+                inputStream = new FileReader("xanadu.txt");
+                outputStream = new FileWriter("characteroutput.txt");
+
+                int c;
+                while ((c = inputStream.read()) != -1) {
+                    outputStream.write(c);
+                }
+            } finally {
+                if (inputStream != null) {
+                    inputStream.close();
+                }
+                if (outputStream != null) {
+                    outputStream.close();
+                }
+            }
+        }
+    }
+
+字符用常常是字节流的封装,将字节流转化为字符用常用的方式是:`InputStreamReader`和`OutputStreamWriter`.
+
+<h4 id="3.3">3.3 Buffered Stream</h4>
+
+字节流和字符流都是非Buffered Stream,也就是说每一次读和写的操作都直接由底层操作系统实现,这样可以使得程序的效率很低,因为操作系统的每一读和写都要调动磁盘网络和其他一些花销很大的操作.
+
+为了解决这种问题,Java实现了buffered I/O流.Buffered输入流从一块内存(buffer)中读取数据,当buffer为空时,调用本地input API;Buffered输出流往一块内存(buffer)中写数据,当buffer满时,调动本地的output API.
+
+*使用Buffered Stream读并写文件:*
+
+    import java.io.FileReader;
+    import java.io.FileWriter;
+    import java.io.BufferedReader;
+    import java.io.PrintWriter;
+    import java.io.IOException;
+
+    public class CopyLines {
+        public static void main(String[] args) throws IOException {
+
+            BufferedReader inputStream = null;
+            PrintWriter outputStream = null;
+
+            try {
+                inputStream = new BufferedReader(new FileReader("xanadu.txt"));
+                outputStream = new PrintWriter(new FileWriter("characteroutput.txt"));
+
+                String l;
+                while ((l = inputStream.readLine()) != null) {
+                    outputStream.println(l);
+                }
+            } finally {
+                if (inputStream != null) {
+                    inputStream.close();
+                }
+                if (outputStream != null) {
+                    outputStream.close();
+                }
+            }
+        }
+    }
+
+除了这三种流之外,Java还提供了DataStream和ObjectStream,分别用来处理基本数据类型和序列化操作.
+
+---
+
+<h3 id="4">4. Java多线程</h3>
+
+<h4 id="4.1">4.1 进程 VS 线程</h4>
 
 **进程:**
 
@@ -206,7 +234,7 @@ Java共享内存区域的大小可以在JVM启动的时候可以设定,如果不
 
 Java支持多线程环境是必要的.如果你认为内存管理和信号处理是一个线程,每一个Java应用都至少有一个或者多个线程.但是从开发者的角度,你仅仅从一个线程开始,这个线程是主线程.这个主线程有能力创建其他线程.
 
-<h4 id="2.2">线程对象</h4>
+<h4 id="4.2">4.2 线程对象</h4>
 
 使用Thread Object的两种方式:
 
@@ -301,7 +329,7 @@ Thread主要方法:
         }
     }
 
-<h4 id="2.3">同步(Synchronization)</h4>
+<h4 id="4.3">4.3 同步(Synchronization)</h4>
 
 线程间的交流主要是通过共享域和引用对象的访问完成.这种方式的交流非常有效,同时也会带来两种方面的问题:**线程干扰(thread interference)**和**内存一致性(memory consistency errors)**.要解决这些问题,就需要用到同步.
 
@@ -327,7 +355,7 @@ Synchronized同步方法能够阻止线程干扰和内存一致性的问题.
 - 对引用变量及大部分基本数据类型(long,double除外)的读和写操作是原子性的
 - 多所有`volatile`修饰的所有变量(包括long,double)的读和写操作是原子性的
 
-<h4 id="2.4">死锁(deadlock)</h4>
+<h4 id="4.4">4.4 死锁(deadlock)</h4>
 
 **死锁示例:**
 
@@ -380,7 +408,7 @@ Synchronized同步方法能够阻止线程干扰和内存一致性的问题.
 
 > 活锁和死锁一样,程序不能够继续执行,但不同的是活锁中的线程处于繁忙状态,并没有处于block状态.
 
-<h4 id="2.5">Guarded Block</h4>
+<h4 id="4.5">4.5 Guarded Block</h4>
 
 线程之间需要协作对方的行为.最常用的一种协作方式是`Guarded Block`,这个block循环一个条件,当这个条件为`true`时,block才能继续执行.
 
@@ -689,7 +717,7 @@ Synchronized同步方法能够阻止线程干扰和内存一致性的问题.
 > main()方法类
 
 
-<h4>2.6 不可更改(Immutable)对象](#2.6)</h4>
+<h4 id="4.6">4.6 不可更改(Immutable)对象</h4>
 
 如果一个对象创建之后,它的状态(state)就不能别修改,我们称之为`Immutable Object`.在并发的应用中,Immutable对象显得尤为重要.
 
@@ -815,7 +843,7 @@ Synchronized同步方法能够阻止线程干扰和内存一致性的问题.
 
 > 这样,再使用这个对象的时候,就不用一些同步的操作了.
 
-<h4 id="2.7">并发进阶</h4>
+<h4 id="4.7">4.7 并发进阶</h4>
 
 **Lock Object**
 
@@ -856,5 +884,180 @@ Synchronized同步方法能够阻止线程干扰和内存一致性的问题.
 
 - Atomic Variables
     - `AtomicInteger`
+
+---
+
+- <h3 id="5">5. JVM内存模型</h3>
+
+---
+
+<h3 id="6">6. Heap dump Analysis</h3>
+
+Java应用程序要求使用大小有限的共享内存空间,这个限制可以在程序启动的时候指定.为了更加方便应用,逻辑又将之分为堆内存(Heap Space)和方法区(Permanent Generation or Mothod Area).
+
+Java共享内存区域的大小可以在JVM启动的时候可以设定,如果不显示的设定参数值,JVM会使用默认值.
+
+- JVM 默认Heap Size查看方法:
+- `java -XX:+PrintFlagsFinal -version | findstr HeapSize`
+- `java -XX:+PrintFlagsFinal -version | grep HeapSize`
+- 常用JVM启动参数:
+- `-Xms <heap size> [g|m|k] -Xmx <heap size> [g|m|k]`
+- `-XX:PermSize=<per gen size> [g|m|k] -XX:MaxPermSize=<perm gen size> [g|m|k]`
+- `-Xmn <young size> [g|m|k]`
+- `-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=<output file>.hprof`
+- `java -XX:+PrintFlagsFinal -version`
+
+当Java应用程序试图在堆上申请更多的空间,但是设定的内存空间不足时就会引起`java.lang.OutOfMemoryError`.
+
+> 物理机的内存空间可能是充足的,但是当堆内存达到上限的时候就会抛出`java.lang.outOfMemoryError`.
+
+正常情况下,当Java应用程序运行需要比堆上限更对的内存的时候,就会出现异常.这个时候,我们需要重新设定JVM的Heap Space limit.同时,由于程序上的一些错误或者复杂的情况下,也可能发生内存溢出的异常:
+
+- 程序的使用量或者数据量出现峰值
+- 内存泄漏(Memory Leak)
+
+<h4 id = "6.1">6.1 内存溢出的实例</h4>
+
+**堆内存限制导致内存溢出**
+
+    class OMM{
+
+        static final int size = 2*1024*1024;
+        public static void main(String args[]){
+            int[] i = new int[size];
+        }
+    }
+
+> `java OMM -Xmx12m` 会导致内存溢出;`java OMM -Xmx13m`则不会出现内存溢出.
+
+**内存泄漏导致内存溢出**
+
+    import java.util.*;
+
+    public class MemoryLeak{
+
+        static class Key{
+            Integer id;
+
+            Key(Integer id){
+                this.id = id;
+            }
+
+            @Override
+            public int hashCode(){
+                return id.hashCode();
+            }
+
+            /*
+            @Override
+            public boolean equals(Object o){
+                boolean response = false;
+                if(o instanceof Key){
+                    response = (((Key)o).id).equals(this.id);
+                }
+                return response;
+            }
+            */
+        }
+
+        public static void main(String args[]){
+            Map<Key, String> m = new HashMap<Key, String>();
+
+            while(true){
+                for(int i = 0; i < 10000; i++){
+                    if(!m.containsKey(new Key(i))){
+                        m.put(new Key(i), "Nuumber: " + i);
+                    }
+                }
+            }
+        }
+    }
+
+- 程序中如果Key类只复写了`hashCode()`方法,而没有`equals()`方法,则程序会无限制的申请Key对象,直到内存溢出.
+- 内存泄漏: 一些程序不再使用的对象不能够被JVM GC识别,而无法回收.上述的内存泄漏问题可以通过复写`equal()`方法解决.
+
+<h4 id="6.2">6.2 通过工具进行Heap Dump</h4>
+
+查看并分析Java Heap Space有很多方法:
+
+- `jmap(java Memory Map),jhat(java Heap analysis tool)`
+- `jvisualvm`
+- `Plumbr`
+- `IBM HeapAnalyzer`
+- `Eclipse MAT(Memory Analysis Tool)`
+
+**通过Jmap和jhat分析堆内存**
+
+- `jps -lm`: 列出正在运行的Java进程和进程号
+    - `jps`工具在jdk1.6的版本中有
+- `jmap -dump:format=b,file=<some_file>.bin <java_process_num>`
+    - 命令格式可以通过`jmap -help`得到
+- `jhat <some_file>.bin`
+    - 启动一个本地服务:`http://127.0.0.1:7000`,访问即可
+
+**通过jvisualvm分析堆内存**
+
+- 正在运行的应用
+    - `jvisualvm`: 自动监控本地的Java应用
+        - 右键java进程,选择Heap Dump可以查看堆内存实时状态
+- 执行结束的应用
+    - `java <java_app> -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=<output file>.hprof`
+    - `jvisualvm`: 将上述文件装入,即可查看运行结束的Java应用堆内存
+
+<h4 id="6.3">6.3 Java hasCode and equals method</h4>
+
+- `equals`方法
+    - 对于任意的非`null`引用x,`x.equals(x)`应该放回`true`
+    - 对于任意的非`null`引用x y,如果`x.equals(y)`放回true,`y.equals(x)`也应该返回`true`
+    - 对于任意的非`null`引用x y,如果`x.equals(y)`为`true`,`y.equals(z)`为`true`,则`x.equals(z)`应该返回`true`
+    - 多次调用的返回结果应该保持一致性
+    - 对于任意非`null`引用x,`x.equals(null)`应该返回false
+- `hashCode`方法
+    - 在一次的Java运行过程中,一个对象的`hashCode`的返回结果应该保持一致性;多个Java运行实例中一个对象的`hashCode`结果没必要保持一致性.
+    - 如果两个对象equals,则这两个对象必须有相等的hashCode
+    - 如果两个对象有相等的hashCode,则这两个对象未必equals;也就是说非equals的对象,也可能有相等的hashCode
+        - 虽然不equals的对象不要求有不同的hashCode,但如果不同对象对应不同的hashCode,则能够提供性能
+
+**覆写equals方法必须覆写hashCode方法**
+
+    import java.util.*;
+
+    public class Apple{
+
+        private String color;    
+
+        public Apple(String color){
+            this.color = color;
+        }
+
+        @Override
+        public boolean equals(Object obj){
+            if(null == obj){
+                return false;
+            }
+            if(! (obj instanceof Apple)){
+                return false;
+            }
+            if(obj == this){
+                return true;
+            }
+            return color.equals(((Apple)obj).color);
+        }
+
+        /*
+        @Override
+        public int hashCode(){
+            return color.hashCode();
+        }
+        */
+
+        public static void main(String args[]){
+
+            Map<Apple, Integer> appleMap = new HashMap<Apple, Integer>();
+            appleMap.put(new Apple("red"), 1);
+            appleMap.put(new Apple("green"), 2);
+            System.out.println(appleMap.get(new Apple("green")));
+        }
+    }
 
 ---
