@@ -71,6 +71,15 @@ BCNF范式是消除了属性(二三范式说的是非主属性；BCNF说的主�
 
 用户授权信息表(USER-AUT)：`id(PK) | user_id(外键-USER) | identity_id(登录类型) | identifier(标识-手机号、邮箱、第三方登录OpenID等) | credential(密码凭证-站内保存密码站外不保存或者保存token)`
 
+*权限管理系统：*
+
+![权限管理系统设计](/img/posts/privilege-design.png)
+
+> 某某主体 在 某某领域 有 某某权限<br><br>
+1. 主体可以是用户，可以是角色，也可以是一个部门(Master)
+2. 领域可以是一个模块，可以是一个页面，也可以是页面上的按钮(Access)
+3. 权限可以是“可见”，可以是“只读”，也可以是“可用”(如按钮可以点击)(Operation)
+
 ### 数据库设计注意事项
 
 *主键：*
