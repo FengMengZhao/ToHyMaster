@@ -22,7 +22,7 @@
 
 水平分表也称为横向分表，比较容易理解，就是将表中不同的数据行按照一定规律分布到不同的数据库表中（这些表保存在同一个数据库中），这样来降低单表数据量，优化查询性能。最常见的方式就是通过主键或者时间等字段进行Hash和取模后拆分。
 
-> id取模分库分表：<br><br>
+> id取模分库分表：
 1. `tmpvar = user_id % (库的数量 * 表的数量)`
 2. `库 = tmpvar / 表的数量`
 3. `表 = tmpvar % 表的数量`
@@ -52,9 +52,9 @@
 3. 第三范式: 在第二范式的基础上，数据表中如果不存在非关键字段对任一候选关键字段的传递函数依赖则符合第三范式.
 4. BCNF范式：Boyce-Codd Normal Form的简称。数据表中如果不存在主属性对候选主键的部分或传递依赖关系，则符合BCNF范式.换个说法就是：如果属性B依赖属性A，属性A必须是候选主键。
 
-> 第一范式是对属性原子性的约束，要求属性具有原子性，不可再分割；<br><br>
-第二范式是对记录唯一性的约束，要求记录有唯一标识，即实体的唯一性；<br><br>
-第三范式是对冗余字段的约束，即任何字段不能由其他字段派生而来；<br><br>
+> 第一范式是对属性原子性的约束，要求属性具有原子性，不可再分割；
+第二范式是对记录唯一性的约束，要求记录有唯一标识，即实体的唯一性；
+第三范式是对冗余字段的约束，即任何字段不能由其他字段派生而来；
 BCNF范式是消除了属性(二三范式说的是非主属性；BCNF说的主属性)对候选主键的部分和传递依赖关系。例如一张表中有三个字段：学号、课程和教授，候选主键为：学号和课程。满足第一、第二和第三范式，但是不满足BCNF范式。原因是：课程依赖教授，课程是主属性，而教授是非主属性。
 
 **冗余设计**
@@ -80,7 +80,7 @@ BCNF范式是消除了属性(二三范式说的是非主属性；BCNF说的主�
 
 ![权限管理系统设计](/img/posts/privilege-design.png)
 
-> 某某主体 在 某某领域 有 某某权限<br><br>
+> 某某主体 在 某某领域 有 某某权限
 1. 主体可以是用户，可以是角色，也可以是一个部门(Master)
 2. 领域可以是一个模块，可以是一个页面，也可以是页面上的按钮(Access)
 3. 权限可以是“可见”，可以是“只读”，也可以是“可用”(如按钮可以点击)(Operation)
@@ -93,7 +93,7 @@ BCNF范式是消除了属性(二三范式说的是非主属性；BCNF说的主�
 
 ![用户之间的关系表](img/t_user_relation.png)
 
-> 用户之间的关系表。<br><br>
+> 用户之间的关系表。
 之所以要定义类型为关注和粉丝，是为了分表方便。
 
 ![消息元数据表](img/t_msg_info.png)
@@ -114,51 +114,58 @@ BCNF范式是消除了属性(二三范式说的是非主属性；BCNF说的主�
 
 *业务逻辑：*
 
-> A关注B：<br>
+> A关注B：
 1. 在t_user_relation_A中添加`A B 1`
-2. 在t_user_relation_B中添加`B A 0`<br><br>
-原创发消息：<br>
+2. 在t_user_relation_B中添加`B A 0`
+
+> 原创发消息：
 1. 在t_msg_info_A中添加这条元消息，type为0(原创)
 2. 更新t_user_info_A中Msg_count
 3. 在t_uer_msg_index_A中插入A发的这条消息的索引（A的编号和消息编号）
-4. 在t_user_relation_A中找到所有关注A的人，比如B,C,D,E,F等等。并发在这些用户的t_uer_msg_index中插入A的这条信息索引，比如名人微博可以并发多个进程来实现对粉丝的消息同步。<br><br>
-A转发B的消息msg_b：<br>
+4. 在t_user_relation_A中找到所有关注A的人，比如B,C,D,E,F等等。并发在这些用户的t_uer_msg_index中插入A的这条信息索引，比如名人微博可以并发多个进程来实现对粉丝的消息同步。
+
+> A转发B的消息msg_b：
 1. 在t_msg_info_A中添加这条元消息msg_a，type为2(转发)
 2. 更新t_user_info_A中Msg_count
 3. 在t_uer_msg_index_A中插入A发的这条消息的索引（A的编号和消息编号）。如果转发消息希望粉丝能够看到，需要在t_user_relation_A中找到粉丝，更新t_user_msg_index中这些用户的用户消息索引。
 4. 在t_msg_info_B中更新msg_b的Transferred_count和Transfer_count
-5. 在t_msg_msg_relation中添加User_a,msg_a与User_b，msg_b的转发关系，page_index为Transferred_count%page_count<br><br>
-A评论B的消息msg_b：<br>
+5. 在t_msg_msg_relation中添加User_a,msg_a与User_b，msg_b的转发关系，page_index为Transferred_count%page_count
+
+> A评论B的消息msg_b：
 1. 在t_msg_info_A中添加这条元消息msg_a，type为1
 2. 更新t_user_info_A中Msg_count
 3. 在t_uer_msg_index_A中插入A发的这条消息的索引（A的编号和消息编号）
 4. 在t_msg_info_B中更新msg_b的Commented_count和Comment_count
-5. 在t_msg_msg_relation中添加User_a,msg_a与User_b，msg_b的评论关系，page_index为Commented_count%page_count<br><br>
-A删除msg_a：<br>
+5. 在t_msg_msg_relation中添加User_a,msg_a与User_b，msg_b的评论关系，page_index为Commented_count%page_count
+
+> A删除msg_a：
 1. 删除t_msg_info中的元数据msg_a
 2. 删除t_uer_msg_index_A中的User_a，msg_a行记录。粉丝如果查不到改消息，应该提示“原消息已被作者删除”或者只做不显示处理
-3. 备注：如果A的msg_a被别人评论或者引用，那么在对方查看评论或者转发的时候会提示“原消息已被作者删除”<br><br>
-A删除转发消息msg_a：<br>
+3. 备注：如果A的msg_a被别人评论或者引用，那么在对方查看评论或者转发的时候会提示“原消息已被作者删除”
+
+> A删除转发消息msg_a：
 1. 删除t_msg_info_A中的元数据msg_a
 2. 删除t_uer_msg_index_A中的User_a，msg_a行记录
 3. 在t_msg_msg_relation_A表中找到msg_a的源消息，即B的msg_b
 4. 删除t_msg_msg_relation_A中user_a，msg_a和user_b，msg_b的转发关系
-5. 更新t_msg_info_B中msg_b记录的Transfer_count，减1<br><br>
-A删除评论消息msg_a：<br>
+5. 更新t_msg_info_B中msg_b记录的Transfer_count，减1
+
+> A删除评论消息msg_a：
 1. 删除t_msg_info_A中的元数据msg_a
 2. 删除t_uer_msg_index_A中的User_a，msg_a行记录
 3. 在t_msg_msg_relation_A表中找到msg_a的源消息，即B的msg_b
 4. 删除t_msg_msg_relation_A中user_a，msg_a和user_b，msg_b的评论关系
-5. 更新t_msg_info_B中msg_b记录的Commecnt_count，减1<br><br>
-A拉取全部消息：<br><br>
+5. 更新t_msg_info_B中msg_b记录的Commecnt_count，减1
+
+> A拉取全部消息：
 1. 从t_uer_msg_index_A中拉取Author_id，Msg_id，Time_t索引，并以Time_t排序
-2. 通过页码和每页count控制返回结果数量，这样避免了server io 压力冲击<br><br>
+2. 通过页码和每页count控制返回结果数量，这样避免了server io 压力冲击
 
 ### 数据库设计注意事项
 
 *主键：*
 
-> 1. 主键应当是对用户没有意义的;
+1. 主键应当是对用户没有意义的;
 2. 主键应当是单列的。如果要实现多对多关系的连接表，最好也不要用两个外键组合作为连接表的主键，而是应该给这个连接表定义一个主键。
 
 ---
