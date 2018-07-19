@@ -78,7 +78,7 @@ BCNF范式是消除了属性(二三范式说的是非主属性；BCNF说的主�
 
 *权限管理系统：*
 
-![权限管理系统设计](/img/posts/privilege-design.png)
+![权限管理系统设计](img/privilege-design.png)
 
 > 某某主体 在 某某领域 有 某某权限
 1. 主体可以是用户，可以是角色，也可以是一个部门(Master)
