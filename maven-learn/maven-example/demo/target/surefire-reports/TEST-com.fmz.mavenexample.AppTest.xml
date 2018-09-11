@@ -21,25 +21,25 @@
     <property name="java.endorsed.dirs" value="C:\Program Files\Java\jdk1.7.0_09\jre\lib\endorsed"/>
     <property name="os.arch" value="amd64"/>
     <property name="surefire.real.class.path" value="E:\Workspaces\git_repo\ToHyMaster\maven-learn\maven-example\demo\target\surefire\surefirebooter8237146796172165101.jar"/>
-    <property name="java.io.tmpdir" value="C:\Users\huayu\AppData\Local\Temp\"/>
+    <property name="java.io.tmpdir" value="C:\Users\*****\AppData\Local\Temp\"/>
     <property name="line.separator" value="
 "/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="user.variant" value=""/>
     <property name="os.name" value="Windows 8"/>
     <property name="sun.jnu.encoding" value="GBK"/>
-    <property name="java.library.path" value="C:\Program Files\Java\jdk1.7.0_09\jre\bin;C:\Windows\Sun\Java\bin;C:\Windows\system32;C:\Windows;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;D:\MySQL_Server\bin\;C:\Program Files\Java\jdk1.7.0_09\bin;D:\TortoiseGit\bin;D:\maven3\bin;C:\Users\huayu\AsrPlatform\AsrService;D:\PostgreSQL\9.6\bin;D:\Vim\vim80;D:\python\python3.6\Scripts\;D:\python\python3.6\;C:\Users\huayu\AppData\Local\Programs\Fiddler;."/>
+    <property name="java.library.path" value="C:\Program Files\Java\jdk1.7.0_09\jre\bin;C:\Windows\Sun\Java\bin;C:\Windows\system32;C:\Windows;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;D:\MySQL_Server\bin\;C:\Program Files\Java\jdk1.7.0_09\bin;D:\TortoiseGit\bin;D:\maven3\bin;C:\Users\*****\AsrPlatform\AsrService;D:\PostgreSQL\9.6\bin;D:\Vim\vim80;D:\python\python3.6\Scripts\;D:\python\python3.6\;C:\Users\*****\AppData\Local\Programs\Fiddler;."/>
     <property name="surefire.test.class.path" value="E:\Workspaces\git_repo\ToHyMaster\maven-learn\maven-example\demo\target\test-classes;E:\Workspaces\git_repo\ToHyMaster\maven-learn\maven-example\demo\target\classes;F:\repository\maven\junit\junit\3.8.1\junit-3.8.1.jar;"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="java.class.version" value="51.0"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="os.version" value="6.2"/>
-    <property name="user.home" value="C:\Users\huayu"/>
+    <property name="user.home" value="C:\Users\*****"/>
     <property name="user.timezone" value=""/>
     <property name="java.awt.printerjob" value="sun.awt.windows.WPrinterJob"/>
     <property name="java.specification.version" value="1.7"/>
     <property name="file.encoding" value="GBK"/>
-    <property name="user.name" value="huayu"/>
+    <property name="user.name" value="*****"/>
     <property name="java.class.path" value="E:\Workspaces\git_repo\ToHyMaster\maven-learn\maven-example\demo\target\test-classes;E:\Workspaces\git_repo\ToHyMaster\maven-learn\maven-example\demo\target\classes;F:\repository\maven\junit\junit\3.8.1\junit-3.8.1.jar;"/>
     <property name="java.vm.specification.version" value="1.7"/>
     <property name="sun.arch.data.model" value="64"/>
