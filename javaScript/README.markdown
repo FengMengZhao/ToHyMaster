@@ -29,3 +29,33 @@ JavaScript代码会在执行引擎的执行栈中以单线程的方式执行,而
 1. 核心(ECMAScript): 描述了JS的语法和基本对象.
 2. 文档对象模型(DOM): 处理网页内容方法和接口.
 3. 浏览器对象模型(BOM): 与浏览器交互的方法和接口.
+
+## JavaScript中级(2018-Q3_4)
+
+### 作用域
+
+JS的数据类型：
+
+- 基本数据类型
+    - `Boolean`
+    - `Number`(数值)
+    - `String`
+    - `undefined`
+    - `NULL`
+- 引用数据类型
+    - 对象
+    - 数组
+    - 函数
+
+在`for`循环和`if`等语句中没有块级作用域。
+
+    <script type="text/javascript">
+    if(true){//if语句的花括号没有作用域的功能。
+        var box = "trigkit4";
+    }
+    alert(box);//弹出 trigkit4
+    </script>
+
+### 内存
+
+javascript具有自动垃圾回收机制，一旦数据不再使用，可以将其设为`null`来释放引用。
