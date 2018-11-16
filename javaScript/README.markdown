@@ -30,6 +30,8 @@ JavaScript代码会在执行引擎的执行栈中以单线程的方式执行,而
 2. 文档对象模型(DOM): 处理网页内容方法和接口.
 3. 浏览器对象模型(BOM): 与浏览器交互的方法和接口.
 
+---
+
 ## JavaScript中级(2018-Q3_4)
 
 ### 作用域
@@ -59,3 +61,23 @@ JS的数据类型：
 ### 内存
 
 javascript具有自动垃圾回收机制，一旦数据不再使用，可以将其设为`null`来释放引用。
+
+### 闭包
+
+官方解释：「闭包」，是指拥有多个变量和绑定了这些变量的环境的表达式（通常是一个函数），因而这些变量也是该表达式的一部分。
+
+通俗理解：闭包是个函数，而它「记住了周围发生了什么」。表现为由「一个函数」体中定义了「另个函数」。
+
+**闭包的作用：**
+
+- setTimeout/setInterval
+- 回调函数（callback）
+- 事件句柄（event handle）
+
+---
+
+**相关链接:**
+
+- [JavaScript之锋利的JQuery](https://fengmengzhao.github.io/2015/10/01/JavaScript-jquery.html)
+- [JavaScript和DOM编程艺术](https://fengmengzhao.github.io/2015/09/27/JavaScript-DOM-programming-art.html)
+- [BootStrap基础框架](https://fengmengzhao.github.io/2015/12/23/BootStrap-frame-basic.html)
